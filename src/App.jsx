@@ -508,16 +508,17 @@ function App() {
        addLog(`[STASIS] ${info.id}: SUMMON LOOCK PROTOCOLS DISABLED FOR 1 TURN!`);
     }
     if (e.onSummonDestroyStrongest) {
-      const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
-      const setEGrave = isPlayer ? setOppGrave : setGrave;
-      setEnemy(prev => {
-        if (!prev.length) return prev;
-        let maxAtk = -1, idx = 0;
-        prev.forEach((c, i) => { const a = parseCardData(c.cardId).attack; if (a > maxAtk) { maxAtk = a; idx = i; } });
-        setEGrave(g => [...g, prev[idx].cardId]);
-        addLog(`[EFFECT] DESTROYED STRONGEST: ${prev[idx].cardId}`);
-        return prev.filter((_, i) => i !== idx);
-      });
+       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
+       const setEGrave = isPlayer ? setOppGrave : setGrave;
+       setEnemy(prev => {
+          if (!prev.length) { addLog(`[STRIKE] ${info.id}: NO ENEMY TARGETS TO DESTROY`); return prev; }
+          let maxAtk = -1, idx = 0;
+          prev.forEach((c, i) => { const a = parseCardData(c.cardId).attack; if (a > maxAtk) { maxAtk = a; idx = i; } });
+          const victim = prev[idx];
+          setEGrave(g => [...g, victim.cardId]);
+          addLog(`[STRIKE] ${info.id} DESTROYED THE STRONGEST ENEMY: ${victim.cardId} (ATK:${parseCardData(victim.cardId).attack})`);
+          return prev.filter((_, i) => i !== idx);
+       });
     }
     if (e.onSummonDestroyRandom) {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
