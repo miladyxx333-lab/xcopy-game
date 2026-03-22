@@ -62,8 +62,10 @@ const parseCardData = (id) => {
     if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2]);
   }
 
-  if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff))
-    e.onSummonDiscardOpp = parseInt((eff.match(/discard (\d+)/i) || [0, 1])[1]);
+  if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff)) {
+    const discardM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*discard/i);
+    e.onSummonDiscardOpp = discardM ? parseInt(discardM[1]) : 1;
+  }
 
   // Damage: all enemy > all cards > player HP > single target
   if (/deal (\d+) damage to all.*enem|deal (\d+) damage to all.*opponent/i.test(eff))
