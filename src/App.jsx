@@ -739,48 +739,45 @@ function App() {
 
   // ---- RESOLVE STACK ----
   const forceResolveStack = useCallback((stack) => {
-    let addP = [], addO = [];
+    let addP = [], addO = [], pendingEffects = [];
+    
     stack.forEach(item => {
       const card = parseCardData(item.cardId);
       if (card.isCreature) {
         const obj = { id: Math.random().toString(), cardId: item.cardId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, usedOnceEffect: false, usedTurnEffect: false };
-        if (item.owner === 'PLAYER') { 
-          addP.push(obj); 
+        if (item.owner === 'PLAYER') {
+          addP.push(obj);
           addLog(`> SUMMONED: ${card.id}`);
-          // Execute sacrifice if needed
           if (card.effects.requiresSacrifice) {
             let rem = card.effects.requiresSacrifice, type = card.effects.sacrificeType;
             setPlayArea(prev => {
-              const res = []; 
+              const res = [];
               for (const c of prev) {
                 if (rem > 0 && (type ? parseCardData(c.cardId).rawText.toLowerCase().includes(type) : (c.cardId !== '0' && !c.cardId.startsWith('TOKEN'))))
-                  { setGrave(g => [...g, c.cardId]); addLog(`[SACRIFICE] ${c.cardId} sacrificed`); rem--; }
+                  { setGrave(g => [...g, c.cardId]); rem--; }
                 else res.push(c);
               }
               return res;
             });
           }
-        }
-        else { 
-          addO.push(obj); 
+        } else {
+          addO.push(obj);
           addLog(`> AI SUMMONED: ${card.id}`);
-          // Execute AI sacrifice if needed
           if (card.effects.requiresSacrifice) {
             let rem = card.effects.requiresSacrifice, type = card.effects.sacrificeType;
             setOppPlayArea(prev => {
               const res = [];
               for (const c of prev) {
-                if (rem > 0 && (type ? parseCardData(c.cardId).rawText.toLowerCase().includes(type) : (c.cardId !== '0' && !c.cardId.startsWith('TOKEN')))) 
-                  { setOppGrave(g => [...g, c.cardId]); addLog(`[AI SACRIFICE] ${c.cardId} sacrificed`); rem--; }
+                if (rem > 0 && (type ? parseCardData(c.cardId).rawText.toLowerCase().includes(type) : (c.cardId !== '0' && !c.cardId.startsWith('TOKEN'))))
+                  { setOppGrave(g => [...g, c.cardId]); rem--; }
                 else res.push(c);
               }
               return res;
             });
           }
         }
-        runOnSummon(card, item.owner === 'PLAYER', obj.id);
+        pendingEffects.push({ card, owner: item.owner, instanceId: obj.id });
       } else {
-        // Spell/Instant
         if (item.owner === 'PLAYER') setGrave(g => [...g, item.cardId]);
         else setOppGrave(g => [...g, item.cardId]);
 
@@ -790,15 +787,22 @@ function App() {
           setEnemy(prev => {
             const idx = prev.findIndex(c => c.isAttacking);
             if (idx > -1) { setEGrave(g => [...g, prev[idx].cardId]); addLog(`> COUNTER: DESTROYED ATTACKER!`); return prev.filter((_, i) => i !== idx); }
-            addLog(`> COUNTER: NO TARGET`); return prev;
+            return prev;
           });
         }
-        runOnSummon(card, item.owner === 'PLAYER', null);
+        pendingEffects.push({ card, owner: item.owner, instanceId: null });
         addLog(`> SPELL RESOLVED: ${card.id}`);
       }
     });
+
     if (addP.length) setPlayArea(prev => [...prev, ...addP]);
     if (addO.length) setOppPlayArea(prev => [...prev, ...addO]);
+    
+    // Decouple effect execution to ensure field is updated
+    setTimeout(() => {
+      pendingEffects.forEach(e => runOnSummon(e.card, e.owner === 'PLAYER', e.instanceId));
+    }, 50);
+
     setExecutionStack([]);
   }, [addLog, runOnSummon]);
 
