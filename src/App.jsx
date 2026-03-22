@@ -322,6 +322,10 @@ function App() {
   const [oppHp, setOppHp] = useState(INITIAL_HP);
   const [oppSoup, setOppSoup] = useState({ current: 0, max: 0 });
 
+  const [sacTargetIds, setSacTargetIds] = useState([]);
+  const [activeSacContext, setActiveSacContext] = useState(null);
+
+
   const [executionStack, setExecutionStack] = useState([]);
   const [pLockSummon, setPLockSummon] = useState(0);
   const [oLockSummon, setOLockSummon] = useState(0);
@@ -1338,21 +1342,30 @@ function App() {
     }
     if (abil.draw) { for(let i=0; i<abil.draw; i++) drawCard(isP); }
     if (abil.sacrifice && abil.summon) {
-       const setArea = isP ? setPlayArea : setOppPlayArea;
-       const setG = isP ? setGrave : setOppGrave;
-       setArea(prev => {
-          if (prev.length < 2) { addLog("! NOT ENOUGH CREATURES TO SACRIFICE"); return prev; }
-          const others = prev.filter(c => c.id !== cardInstanceId);
-          const sacIdx = Math.floor(Math.random() * others.length);
-          const sacCard = others[sacIdx];
-          setG(g => [...g, sacCard.cardId]);
-          addLog(`[SACRIFICE] CONSUMED ${sacCard.cardId}`);
-          
-          const tokenAtk = abil.summon.atk;
-          const tokenDef = abil.summon.def;
-          const tokenId = `TOKEN_${tokenAtk}_${tokenDef}_DOOM`;
-          return [...prev.filter(c => c.id !== sacCard.id).map(c => c.id === cardInstanceId ? { ...c, usedOnceEffect: true } : c), { id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }];
+       if (area.length < abil.sacrifice + 1) { addLog("! NOT ENOUGH CREATURES TO SACRIFICE"); return; }
+       setActiveSacContext({
+          count: abil.sacrifice,
+          initiatorId: cardInstanceId,
+          type: ci.effects.sacrificeType || 'any',
+          onComplete: (targets) => {
+             const setArea = isP ? setPlayArea : setOppPlayArea;
+             const setG = isP ? setGrave : setOppGrave;
+             setArea(prev => {
+                const survivors = prev.filter(c => !targets.includes(c.id));
+                const tokenAtk = abil.summon.atk;
+                const tokenDef = abil.summon.def;
+                const tokenId = `TOKEN_${tokenAtk}_${tokenDef}_DOOM`;
+                return survivors.map(c => c.id === cardInstanceId ? { ...c, usedOnceEffect: true } : c).concat([{ id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }]);
+             });
+             targets.forEach(tid => {
+                const victim = area.find(c => c.id === tid);
+                if (victim) setG(g => [...g, victim.cardId]);
+             });
+             addLog(`[RITUAL] SUMMONED THE GUARDIAN VIA SACRIFICE`);
+          }
        });
+       setSacTargetIds([]);
+       addLog(`[ABILITY] ${ci.id}: INITIATING RITUAL - SELECT ${abil.sacrifice} TARGETS`);
     }
     if (abil.silenceEnemy) {
       const targetArea = isP ? setOppPlayArea : setPlayArea;
@@ -1434,27 +1447,32 @@ function App() {
     return (
       <div key={i}
         onClick={() => {
+          if (activeSacContext) {
+             if (isOpp || obj.id === activeSacContext.initiatorId) return;
+             if (activeSacContext.type !== 'any' && !ci.rawText.toLowerCase().includes(activeSacContext.type)) {
+                addLog(`! ONLY ${activeSacContext.type.toUpperCase()} UNITS CAN BE SACRIFICED`);
+                return;
+             }
+             setSacTargetIds(prev => prev.includes(obj.id) ? prev.filter(id => id !== obj.id) : [...prev, obj.id]);
+             return;
+          }
           if (isOpp) {
              if (phase === 'DECLARE_BLOCKS') assignBlocker(i);
-          } else {
-             if (turn === 'PLAYER') {
-                if (phase === 'MAIN' && ci.effects.activatedAbility) useAbility(obj.id, true);
-                else if (phase === 'DECLARE_ATTACKS' && !isSoup) toggleAttack(i);
-                else if (phase === 'DECLARE_BLOCKS') selectBlocker(i);
-             } else if (turn === 'AI' && phase === 'DECLARE_BLOCKS') {
-                selectBlocker(i);
-             }
+          } else if (turn === 'PLAYER') {
+             if (phase === 'MAIN' && ci.effects.activatedAbility) useAbility(obj.id, true);
+             else if (phase === 'DECLARE_ATTACKS' && !isSoup) toggleAttack(i);
+             else if (phase === 'DECLARE_BLOCKS') selectBlocker(i);
           }
         }}
         {...bH(obj.cardId)}
-        className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan')}`}
+        className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${sacTargetIds.includes(obj.id) ? 'neon-border-pink' : (obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan'))}`}
         style={{
           position: 'relative', backgroundImage: `url(/cards/${obj.cardId}.png)`,
           opacity: isSoup || obj.canAttack ? 1 : (obj.silenced ? 0.3 : (obj.frozen ? 0.6 : 0.5)),
           filter: obj.silenced ? 'grayscale(0.8)' : (obj.frozen ? 'hue-rotate(180deg) brightness(1.2)' : 'none'),
           transform: obj.isAttacking ? (isOpp ? 'translateY(20px)' : 'translateY(-20px)') : 'none',
-          boxShadow: obj.frozen ? '0 0 15px #0ff' : (isTarget ? '0 0 15px #f0f' : (isSel ? '0 0 15px #0ff' : '')),
-          cursor: isTarget || (!isSoup && obj.canAttack && (phase === 'DECLARE_ATTACKS' || phase === 'DECLARE_BLOCKS')) ? 'pointer' : 'default',
+          boxShadow: obj.frozen ? '0 0 15px #0ff' : (isTarget ? '0 0 15px #f0f' : (isSel || sacTargetIds.includes(obj.id) ? '0 0 15px #0ff' : '')),
+          cursor: isTarget || (!isSoup && obj.canAttack && (phase === 'DECLARE_ATTACKS' || phase === 'DECLARE_BLOCKS')) || (activeSacContext && !isOpp && obj.id !== activeSacContext.initiatorId) ? 'pointer' : 'default',
         }}>
         {zBtn(obj.cardId)}
         {obj.silenced && <div style={{ position: 'absolute', top: 5, right: 5, fontSize: 16 }}>📵</div>}
@@ -1477,6 +1495,28 @@ function App() {
     <div className="game-board" onMouseMove={handleMouseMove}>
       {renderInspector()}
       {renderZoom()}
+
+      {activeSacContext && (
+         <div style={{ position: 'fixed', top: 120, left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,0,255,0.9)', color: '#000', padding: '10px 20px', borderRadius: 8, zIndex: 10000, display: 'flex', gap: 15, alignItems: 'center', fontWeight: 'bold', boxShadow: '0 0 30px #f0f' }}>
+            <span>SELECT {activeSacContext.count} TRIBUTES ({sacTargetIds.length}/{activeSacContext.count})</span>
+            <button 
+              onClick={() => {
+                 if (sacTargetIds.length === activeSacContext.count) {
+                    activeSacContext.onComplete(sacTargetIds);
+                    setActiveSacContext(null);
+                    setSacTargetIds([]);
+                 } else {
+                    addLog(`! NEED ${activeSacContext.count} TRIBUTES`);
+                 }
+              }}
+              style={{ padding: '5px 15px', background: '#000', color: '#f0f', border: '1px solid #f0f', cursor: 'pointer', fontWeight: 'bold' }}
+            >CONFIRM SACRIFICE</button>
+            <button 
+              onClick={() => { setActiveSacContext(null); setSacTargetIds([]); addLog("> RITUAL ABORTED"); }}
+              style={{ padding: '5px 10px', background: '#333', color: '#fff', border: 'none', cursor: 'pointer' }}
+            >CANCEL</button>
+         </div>
+      )}
 
       <header className="hud">
         <div className="player-info opponent">
