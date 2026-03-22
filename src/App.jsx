@@ -428,8 +428,13 @@ function App() {
       setOppPlayArea(prev => prev.filter(c => { if (parseCardData(c.cardId).defense <= dmg) { setOppGrave(g => [...g, c.cardId]); return false; } return true; }));
     }
     if (e.onSummonDiscardOpp) {
-      (isPlayer ? setOppHand : setHand)(h => { if (!h.length) return h; const n = [...h]; n.splice(Math.floor(Math.random() * n.length), 1); return n; });
-      addLog(`[EFFECT] ${info.id}: FORCED DISCARD!`);
+      addLog(`[EFFECT] ${info.id}: INITIATING DISCARD...`);
+      (isPlayer ? setOppHand : setHand)(h => { 
+        if (!h.length) { addLog(`[EFFECT] ${info.id}: TARGET HAND EMPTY`); return h; } 
+        const n = [...h]; n.splice(Math.floor(Math.random() * n.length), 1); 
+        return n; 
+      });
+      addLog(`[EFFECT] ${info.id}: FORCED DISCARD COMPLETED`);
     }
     if (e.onSummonWheel) {
       const setOppH = isPlayer ? setOppHand : setHand;
