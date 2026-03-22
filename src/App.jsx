@@ -1184,10 +1184,9 @@ function App() {
       <div key={i}
         onClick={() => isOpp ? assignBlocker(i) : (turn === 'PLAYER' && phase === 'DECLARE_ATTACKS' && !isSoup ? toggleAttack(i) : selectBlocker(i))}
         {...bH(obj.cardId)}
-        className={`card-placeholder ${isSoup ? 'neon-border-green' : (obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan'))}`}
+        className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan')}`}
         style={{
-          position: 'relative', backgroundImage: `url(/cards/${obj.cardId}.png)`, backgroundSize: 'cover',
-          width: isSoup ? 60 : 80, height: isSoup ? 80 : 110,
+          position: 'relative', backgroundImage: `url(/cards/${obj.cardId}.png)`,
           opacity: isSoup || obj.canAttack ? 1 : 0.5,
           transform: obj.isAttacking ? (isOpp ? 'translateY(20px)' : 'translateY(-20px)') : 'none',
           boxShadow: isTarget ? '0 0 15px #f0f' : (isSel ? '0 0 15px #0ff' : ''),
@@ -1243,7 +1242,7 @@ function App() {
       <main className="table">
         <div className="opponent-zone">
           <div className="zone hand">
-            {oppHand.map((_, i) => <div key={i} {...bH('card_back (9)')} className="card-placeholder neon-border-red" style={{ backgroundImage: "url('/cards/card_back (9).png')", backgroundSize: 'cover', width: 60, height: 80 }} />)}
+            {oppHand.map((_, i) => <div key={i} {...bH('card_back (9)')} className="card-placeholder card-soup neon-border-red" style={{ backgroundImage: "url('/cards/card_back (9).png')" }} />)}
           </div>
           <div className="zone play-area">{oppPlayArea.map((o, i) => fieldCard(o, i, true))}</div>
         </div>
@@ -1252,7 +1251,7 @@ function App() {
           <div className="stack-title">EXECUTION QUEUE</div>
           <div className="stack-area">
             {executionStack.map((item, i) => (
-              <div key={i} {...bH(item.cardId)} className={`card-placeholder ${item.owner === 'PLAYER' ? 'neon-border-cyan' : 'neon-border-red'}`} style={{ position: 'relative', backgroundImage: `url(/cards/${item.cardId}.png)`, backgroundSize: 'cover', width: 60, height: 80 }}>
+              <div key={i} {...bH(item.cardId)} className={`card-placeholder card-soup ${item.owner === 'PLAYER' ? 'neon-border-cyan' : 'neon-border-red'}`} style={{ position: 'relative', backgroundImage: `url(/cards/${item.cardId}.png)` }}>
                 {zBtn(item.cardId)}
               </div>
             ))}
@@ -1265,7 +1264,7 @@ function App() {
             {hand.map((cardId, i) => {
               const ci = parseCardData(cardId);
               return (
-                <div key={`h-${i}`} {...bH(cardId)} className="card-placeholder neon-border-cyan" style={{ position: 'relative', backgroundImage: `url(/cards/${cardId}.png)`, backgroundSize: 'cover', width: 90, height: 125 }} onClick={() => playCard(i)}>
+                <div key={`h-${i}`} {...bH(cardId)} className="card-placeholder card-hand neon-border-cyan" style={{ position: 'relative', backgroundImage: `url(/cards/${cardId}.png)` }} onClick={() => playCard(i)}>
                   {zBtn(cardId)}
                   {cardId !== "0" && <div style={{ position: 'absolute', top: 0, right: 0, background: '#0ff', color: '#000', padding: 2, fontSize: 10 }}>{ci.cost} S</div>}
                 </div>
@@ -1275,7 +1274,7 @@ function App() {
         </div>
       </main>
 
-      <aside className="side-zones" style={{ width: 250 }}>
+      <aside className="side-zones">
         <div className="terminal-log" style={{ flex: 1, borderBottom: '1px solid rgba(0,255,255,0.2)', marginBottom: 10, fontSize: '0.7rem', color: 'var(--neon-cyan)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: 5, fontFamily: 'monospace', overflow: 'hidden' }}>
           {log.map((l, i) => <div key={i} style={{ marginBottom: 4 }}>{l}</div>)}
         </div>

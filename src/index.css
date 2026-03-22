@@ -35,11 +35,27 @@ body {
 
 .game-board {
   display: grid;
-  grid-template-rows: 60px 1fr;
-  grid-template-columns: 1fr 150px;
-  height: 100%;
-  padding: 10px;
+  grid-template-rows: auto 1fr;
+  grid-template-columns: 1fr 200px;
+  height: 100vh;
   gap: 10px;
+  overflow: hidden;
+}
+
+.hud { grid-row: 1; grid-column: 1 / -1; }
+.table { grid-row: 2; grid-column: 1; }
+.side-zones { grid-row: 2; grid-column: 2; }
+
+@media (max-width: 1024px) {
+  .game-board {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+  .table { grid-row: 2; grid-column: 1; }
+  .side-zones { grid-row: 3; grid-column: 1; margin-top: 20px; }
 }
 
 .hud {
@@ -91,6 +107,18 @@ body {
   letter-spacing: 2px;
 }
 
+@media (max-width: 768px) {
+  .player-info {
+    font-size: 0.9rem;
+    gap: 10px;
+  }
+  .hud {
+    padding: 0 5px;
+    flex-direction: column;
+    height: auto;
+  }
+}
+
 .game-status {
   text-align: center;
 }
@@ -132,11 +160,18 @@ body {
 }
 
 .zone {
-  padding: 10px;
+  padding: 5px;
   display: flex;
-  gap: 15px;
+  gap: 10px;
   align-items: center;
   justify-content: center;
+  flex-wrap: wrap; /* Allow cards to wrap on small screens */
+}
+
+@media (max-width: 768px) {
+  .zone {
+    gap: 5px;
+  }
 }
 
 .hand {
@@ -147,8 +182,6 @@ body {
 
 /* CARDS */
 .card-placeholder {
-  width: 80px;
-  height: 110px;
   background-color: var(--card-bg);
   border: 1px solid rgba(255,255,255,0.2);
   display: flex;
@@ -160,6 +193,20 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.card-field { width: 80px; height: 110px; }
+.card-hand { width: 95px; height: 130px; }
+.card-soup { width: 60px; height: 80px; }
+
+@media (max-width: 768px) {
+  .card-placeholder { font-size: 0.6rem; }
+  .card-field { width: 60px; height: 82px; }
+  .card-hand { width: 70px; height: 95px; }
+  .card-soup { width: 50px; height: 70px; }
 }
 
 .card-placeholder:hover {
@@ -227,6 +274,19 @@ body {
   justify-content: space-between;
   border-left: 1px solid rgba(0,255,255,0.2);
   padding: 10px;
+  background: rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+  .side-zones {
+    flex-direction: row;
+    border-left: none;
+    border-top: 1px solid rgba(0,255,255,0.2);
+    width: 100%;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 15px;
+  }
 }
 
 .deck-zone, .grave-zone {
