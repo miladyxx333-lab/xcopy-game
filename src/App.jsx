@@ -1418,7 +1418,15 @@ function App() {
     const isSel = !isOpp && selectedBlocker === i;
     return (
       <div key={i}
-        onClick={() => isOpp ? assignBlocker(i) : (turn === 'PLAYER' && phase === 'DECLARE_ATTACKS' && !isSoup ? toggleAttack(i) : selectBlocker(i))}
+        onClick={() => {
+          if (isOpp) {
+             if (phase === 'DECLARE_BLOCKS') assignBlocker(i);
+          } else if (turn === 'PLAYER') {
+             if (phase === 'MAIN' && ci.effects.activatedAbility) useAbility(obj.id, true);
+             else if (phase === 'DECLARE_ATTACKS' && !isSoup) toggleAttack(i);
+             else if (phase === 'DECLARE_BLOCKS') selectBlocker(i);
+          }
+        }}
         {...bH(obj.cardId)}
         className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan')}`}
         style={{
@@ -1437,9 +1445,9 @@ function App() {
         {ci.effects.activatedAbility && turn === (isOpp ? 'AI' : 'PLAYER') && (!ci.effects.oncePerGame || !obj.usedOnceEffect) && (
            <button 
              onClick={(e) => { e.stopPropagation(); useAbility(obj.id, !isOpp); }} 
-             style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: ci.effects.activatedAbility.sacrifice ? 'var(--neon-cyan)' : 'var(--neon-pink)', border: 'none', color: '#000', fontSize: 10, borderRadius: '4px', cursor: 'pointer', boxShadow: '0 0 10px #f0f', padding: '2px 5px', fontWeight: 'bold' }}
+             style={{ position: 'absolute', top: -15, left: '50%', transform: 'translateX(-50%)', background: ci.effects.activatedAbility.sacrifice ? '#ff00ff' : 'var(--neon-pink)', border: '2px solid #fff', color: '#fff', fontSize: 11, borderRadius: '4px', cursor: 'pointer', boxShadow: '0 0 15px #f0f', padding: '4px 8px', fontWeight: 'bold', zIndex: 100 }}
            >
-             {ci.effects.activatedAbility.sacrifice ? 'SACRIFICE' : `PAY ${ci.effects.activatedAbility.cost} ⚡️`}
+             {ci.effects.activatedAbility.sacrifice ? '⚡ SACRIFICE' : '⚡ ABILITY'}
            </button>
         )}
       </div>
