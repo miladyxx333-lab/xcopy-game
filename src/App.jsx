@@ -211,19 +211,19 @@ const parseCardData = (id) => {
   }
 
   // ====== ACTIVATED ABILITIES (V10) ======
-  if (/pay (\d+) (energy|can)|sacrifice.*summon/i.test(eff)) {
+  if (/pay (\d+) (energy|can)|sacrifice.*summon|once per turn.*lose/i.test(eff)) {
      const payCostM = eff.match(/pay (\d+)/i);
      const payCost = payCostM ? parseInt(payCostM[1]) : 0;
      e.activatedAbility = { cost: payCost };
-     if (/sacrifice.*summon/i.test(eff)) {
+     if (/sacrifice.*summon|summon/i.test(eff) && /sacrifice/i.test(eff)) {
         const sm = eff.match(/summon.*?(\d+)\/(\d+)/i);
         e.activatedAbility.sacrifice = 1;
         if (sm) e.activatedAbility.summon = { atk: +sm[1], def: +sm[2] };
      }
+     if (/lose all abilities/i.test(eff)) e.activatedAbility.silenceEnemy = true;
      if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
      if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
-     if (/discard/i.test(eff)) e.activatedAbility.discard = parseInt((eff.match(/discard.*?(\d+)/i) || [0, 2])[1]);
-     if (/draw/i.test(eff)) e.activatedAbility.draw = parseInt((eff.match(/draw.*?(\d+)/i) || [0, 1])[1]);
+     if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
   }
 
   // ====== LIMITERS ======
@@ -732,7 +732,8 @@ function App() {
     }
   }, [addLog]);
 
-  const runOnAttack = useCallback((cardId, isPlayer, cardInstanceId) => {
+  const runOnAttack = useCallback((cardId, isPlayer, cardInstanceId, isSilenced) => {
+    if (isSilenced) { addLog(`[COMBAT] ${cardId} ATTACKED BUT IS SILENCED (📵)`); return; }
     const e = parseCardData(cardId).effects;
 
     // Once-per-turn enforcement
@@ -966,7 +967,7 @@ function App() {
 
     setPlayArea(pF);
     setOppPlayArea(oF);
-    attackers.forEach(a => runOnAttack(a.cardId, true, a.id));
+    attackers.forEach(a => runOnAttack(a.cardId, true, a.id, a.silenced));
     setTimeout(() => resolveCombat(), 800);
   };
 
@@ -997,7 +998,7 @@ function App() {
       nO.forEach((a, i) => {
         if (!a.isAttacking) return;
         const ai = parseCardData(a.cardId);
-        runOnAttack(a.cardId, false, a.id);
+        runOnAttack(a.cardId, false, a.id, a.silenced);
         if (a.blockedBy) {
           const bi = nP.findIndex(c => c.id === a.blockedBy);
           if (bi > -1) {
@@ -1124,6 +1125,7 @@ function App() {
     const checkPassives = (isP) => {
       const area = isP ? playArea : oppPlayArea;
       area.forEach(obj => {
+        if (obj.silenced) return;
         const ci = parseCardData(obj.cardId);
         const p = ci.effects;
         if (p.passiveOnDeathGainSoup || p.passiveOnDeathDmgAll || p.passiveOnDeathHeal) {
@@ -1199,6 +1201,16 @@ function App() {
           return [...prev.filter(c => c.id !== sacCard.id), { id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }];
        });
     }
+    if (abil.silenceEnemy) {
+      const targetArea = isP ? setOppPlayArea : setPlayArea;
+      const targetP = isP ? oppPlayArea : playArea;
+      if (targetP.length > 0) {
+        let maxAtk = -1, idx = 0;
+        targetP.forEach((c, i) => { const a = parseCardData(c.cardId).attack; if (a > maxAtk) { maxAtk = a; idx = i; } });
+        addLog(`[SILENCE] ${targetP[idx].cardId} HAS LOST ALL ABILITIES 📵`);
+        targetArea(prev => prev.map((c, i) => i === idx ? { ...c, silenced: true } : c));
+      }
+    }
   };
 
   useEffect(() => {
@@ -1273,12 +1285,14 @@ function App() {
         className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan')}`}
         style={{
           position: 'relative', backgroundImage: `url(/cards/${obj.cardId}.png)`,
-          opacity: isSoup || obj.canAttack ? 1 : 0.5,
+          opacity: isSoup || obj.canAttack ? 1 : (obj.silenced ? 0.3 : 0.5),
+          filter: obj.silenced ? 'grayscale(0.8)' : 'none',
           transform: obj.isAttacking ? (isOpp ? 'translateY(20px)' : 'translateY(-20px)') : 'none',
           boxShadow: isTarget ? '0 0 15px #f0f' : (isSel ? '0 0 15px #0ff' : ''),
           cursor: isTarget || (!isSoup && obj.canAttack && (phase === 'DECLARE_ATTACKS' || phase === 'DECLARE_BLOCKS')) ? 'pointer' : 'default',
         }}>
         {zBtn(obj.cardId)}
+        {obj.silenced && <div style={{ position: 'absolute', top: 5, right: 5, fontSize: 16 }}>📵</div>}
         {!isSoup && <div style={{ position: 'absolute', bottom: 0, background: 'rgba(0,0,0,0.8)', width: '100%', fontSize: 8, color: isOpp ? '#f00' : '#0ff' }}>ATK:{ci.attack} DEF:{ci.defense}</div>}
         {obj.blockedBy && <div style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,0,255,0.8)', padding: 2, fontSize: 9, color: '#fff' }}>BLOCKED</div>}
         {ci.effects.activatedAbility && turn === (isOpp ? 'AI' : 'PLAYER') && (!ci.effects.oncePerGame || !obj.usedOnceEffect) && (
