@@ -1085,6 +1085,7 @@ function App() {
   useEffect(() => {
     if (!gsRef.current || winRef.current !== null) return;
     if (turn === 'PLAYER' && phase === 'MAIN') {
+      setSoup(s => ({ ...s, current: s.max }));
       setPLockSummon(prev => Math.max(0, prev - 1));
       setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
       setOppPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
@@ -1113,6 +1114,7 @@ function App() {
       await new Promise(r => setTimeout(r, 500));
       if (!live || winRef.current !== null) return;
 
+      setOppSoup(s => ({ ...s, current: s.max }));
       setOLockSummon(prev => Math.max(0, prev - 1));
       // Reset AI creatures
       setOppPlayArea(prev => prev.map(o => ({ ...o, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
