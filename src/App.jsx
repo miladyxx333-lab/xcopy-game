@@ -120,9 +120,11 @@ const parseCardData = (id) => {
     e.onSummonReduceAtk = parseInt((eff.match(/(\d+)/i) || [0, 1])[1]);
 
   // Summon tokens on entry
-  if (/summon/i.test(eff) && !/attack|destroyed/i.test(eff)) {
-    const tm = eff.match(/summon.*?(\d+).*?(\d+)\/(\d+)/i);
-    if (tm) e.onSummonToken = { count: +tm[1], atk: +tm[2], def: +tm[3] };
+  if (/summon/i.test(eff) && !/attack|destroyed|sacrifice|pay/i.test(eff)) {
+    const tmX = eff.match(/summon.*?(\d+)x.*?(\d+)\/(\d+)/i);
+    const tmA = eff.match(/summon.*?a.*?(\d+)\/(\d+)/i);
+    if (tmX) e.onSummonToken = { count: +tmX[1], atk: +tmX[2], def: +tmX[3] };
+    else if (tmA) e.onSummonToken = { count: 1, atk: +tmA[1], def: +tmA[2] };
     else if (/death token/i.test(eff)) e.onSummonToken = { count: 2, atk: 1, def: 1, type: 'death' };
     else e.onSummonTokenGeneric = true;
   }
@@ -235,7 +237,7 @@ const parseCardData = (id) => {
      const payCost = payCostM ? parseInt(payCostM[1]) : 0;
      e.activatedAbility = { cost: payCost };
      if (/sacrifice.*summon|summon/i.test(eff) && /sacrifice/i.test(eff)) {
-        const sm = eff.match(/summon.*?(\d+)\/(\d+)/i);
+        const sm = eff.match(/summon.*?(\d+)\/(\d+)/i) || eff.match(/sumon.*?(\d+)\/(\d+)/i);
         e.activatedAbility.sacrifice = 1;
         if (sm) e.activatedAbility.summon = { atk: +sm[1], def: +sm[2] };
      }
@@ -1297,6 +1299,7 @@ function App() {
     const setS = isP ? setSoup : setOppSoup;
 
     if (s.current < abil.cost) { addLog("! NOT ENOUGH SOUP"); return; }
+    if (ci.effects.oncePerGame && card.usedOnceEffect) { addLog("! ALREADY USED PROTOCOLS ONCE PER GAME"); return; }
     
     setS(prev => ({ ...prev, current: prev.current - abil.cost }));
     addLog(`[ABILITY] ${ci.id} ACTIVATED! (${abil.cost} SOUP)`);
@@ -1333,7 +1336,7 @@ function App() {
           const tokenAtk = abil.summon.atk;
           const tokenDef = abil.summon.def;
           const tokenId = `TOKEN_${tokenAtk}_${tokenDef}_DOOM`;
-          return [...prev.filter(c => c.id !== sacCard.id), { id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }];
+          return [...prev.filter(c => c.id !== sacCard.id).map(c => c.id === cardInstanceId ? { ...c, usedOnceEffect: true } : c), { id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }];
        });
     }
     if (abil.silenceEnemy) {
