@@ -129,10 +129,16 @@ const parseCardData = (id) => {
   }
 
   // ====== PASSIVE AURA ======
-  if (/all doom.*gain \+(\d+) attack/i.test(eff) && !/once/i.test(eff))
+  if (/all doom.*gain \+(\d+) attack/i.test(eff))
     e.auraBuff = { type: 'doom', amount: parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]) };
-  else if (/all fly.*gain \+(\d+)/i.test(eff) && !/once/i.test(eff))
+  else if (/all fly.*gain \+(\d+)/i.test(eff))
     e.auraBuff = { type: 'fly', amount: parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]) };
+  else if (/all.*death.*gain \+(\d+)/i.test(eff))
+    e.auraBuff = { type: 'death', amount: parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]) };
+
+  // Self-buff per card type on field
+  if (/this card.*gain.*\+(\d+).*for (each|every)/i.test(eff) || /gain \+(\d+) attack for (each|every)/i.test(eff))
+    e.selfBuffPerType = true;
 
   // ====== COUNTER / INSTANT ======
   if (/counter/i.test(eff)) e.isCounter = true;
@@ -142,8 +148,42 @@ const parseCardData = (id) => {
   if (/cannot be blocked by death/i.test(eff)) e.unblockableByDeath = true;
   if (/prevent all damage/i.test(eff)) e.hasShield = true;
 
+  // ====== LIMITERS ======
+  if (/once per game/i.test(eff)) e.oncePerGame = true;
+  if (/once per turn/i.test(eff)) e.oncePerTurn = true;
+
+  // ====== WHEEL / DISCARD ALL ======
+  if (/discard your opponent's entire hand/i.test(eff))
+    e.onSummonWheel = true;
+
+  // ====== SEARCH DECK ======
+  if (/search.*deck/i.test(eff))
+    e.onSummonSearch = true;
+
+  // ====== GRAVEYARD RETURN ======
+  if (/return all destroyed cards to owners' hands/i.test(eff))
+    e.onSummonReturnAllGrave = true;
+
+  // ====== SACRIFICE ======
+  if (/requires.*sacrifice.*?(\d+)/i.test(eff)) {
+    e.requiresSacrifice = parseInt((eff.match(/sacrifice.*?(\d+)/i) || [0, 3])[1]);
+    if (/doom/i.test(eff)) e.sacrificeType = 'doom';
+    else if (/death/i.test(eff)) e.sacrificeType = 'death';
+    else if (/fly/i.test(eff)) e.sacrificeType = 'fly';
+  }
+  if (/sacrifice (one|1|a) card/i.test(eff) && !e.requiresSacrifice)
+    e.sacrificeForEffect = true;
+
+  // ====== DOUBLE ATTACK ======
+  if (/double.*attack/i.test(eff))
+    e.doubleAttack = true;
+
+  // ====== CORRUPT / DESTROY SOUP ======
+  if (/corrupt.*soup|destroy.*can|destroy.*enemy.*can/i.test(eff))
+    e.corruptSoup = true;
+
   // Default spell damage
-  if (isSpell && Object.keys(e).length === 0) e.onSummonDmgPlayer = 2;
+  if (isSpell && Object.keys(e).filter(k => k !== 'isInstant').length === 0) e.onSummonDmgPlayer = 2;
   e.isInstant = isSpell;
 
   return { ...c, cost, attack: atk, defense: def, isCreature, effects: e };
@@ -224,9 +264,22 @@ function App() {
     }
   }, []);
 
-  // ---- EFFECT HOOKS (V6 COMPREHENSIVE) ----
-  const runOnSummon = useCallback((info, isPlayer) => {
+  // ---- EFFECT HOOKS (V7 - WITH ONCE-PER-GAME ENFORCEMENT) ----
+  const runOnSummon = useCallback((info, isPlayer, cardInstanceId) => {
     const e = info.effects;
+
+    // Once-per-game: check if already used, and mark as used
+    if (e.oncePerGame && cardInstanceId) {
+      const setArea = isPlayer ? setPlayArea : setOppPlayArea;
+      let alreadyUsed = false;
+      setArea(prev => {
+        const card = prev.find(c => c.id === cardInstanceId);
+        if (card && card.usedOnceEffect) { alreadyUsed = true; }
+        return prev.map(c => c.id === cardInstanceId ? { ...c, usedOnceEffect: true } : c);
+      });
+      if (alreadyUsed) { addLog(`[EFFECT] ${info.id}: ONCE PER GAME ALREADY USED`); return; }
+    }
+
     if (e.onSummonGainSoup) {
       (isPlayer ? setSoup : setOppSoup)(s => ({ max: s.max + e.onSummonGainSoup, current: s.current + e.onSummonGainSoup }));
       addLog(`[EFFECT] ${info.id}: +${e.onSummonGainSoup} SOUP`);
@@ -349,6 +402,73 @@ function App() {
         return prev;
       });
     }
+    // Wheel effect (#247)
+    if (e.onSummonWheel) {
+      const setOppH = isPlayer ? setOppHand : setHand;
+      setOppH([]);
+      for (let i = 0; i < 5; i++) drawCard(!isPlayer);
+      addLog(`[EFFECT] ${info.id}: WHEEL! OPPONENT HAND RESET TO 5`);
+    }
+    // Return all graveyard cards to hand (#120)
+    if (e.onSummonReturnAllGrave) {
+      setHand(prev => [...prev, ...grave]);
+      setOppHand(prev => [...prev, ...oppGrave]);
+      setGrave([]);
+      setOppGrave([]);
+      addLog(`[EFFECT] ${info.id}: ALL GRAVEYARDS RETURNED TO HANDS`);
+    }
+    // Search Deck (randomized for simplicity)
+    if (e.onSummonSearch) {
+      const setD = isPlayer ? setDeck : setOppDeck;
+      const setH = isPlayer ? setHand : setOppHand;
+      setD(prev => {
+        if (!prev.length) return prev;
+        const d = [...prev];
+        const idx = Math.floor(Math.random() * d.length);
+        const cardFound = d.splice(idx, 1)[0];
+        setH(h => [...h, cardFound]);
+        return d;
+      });
+      addLog(`[EFFECT] ${info.id}: SEARCHED DECK & DREW 1 CARD`);
+    }
+    // Self-buff per type on field (V7 Dynamic)
+    if (e.selfBuffPerType) {
+      const type = /fly/i.test(info.id) || /fly/i.test(info.rawText) ? 'fly' : /doom/i.test(info.id) || /doom/i.test(info.rawText) ? 'doom' : 'death';
+      const myArea = isPlayer ? pRef.current : oRef.current;
+      const count = myArea.filter(c => parseCardData(c.cardId).rawText.toLowerCase().includes(type) || c.cardId === info.id).length;
+      if (count > 0) {
+        (isPlayer ? setPlayArea : setOppPlayArea)(prev => prev.map(c => 
+          (c.id === cardInstanceId) ? { ...c, atkMod: (c.atkMod || 0) + count } : c
+        ));
+        addLog(`[EFFECT] ${info.id}: SELF-BUFF +${count} ATK (${type.toUpperCase()} COUNT)`);
+      }
+    }
+    // Double Attack: all doom cards get 2x attack this turn
+    if (e.doubleAttack) {
+      (isPlayer ? setPlayArea : setOppPlayArea)(prev => prev.map(c => {
+        if (parseCardData(c.cardId).rawText.toLowerCase().includes('doom'))
+          return { ...c, atkMod: (c.atkMod || 0) + parseCardData(c.cardId).attack };
+        return c;
+      }));
+      addLog(`[EFFECT] ${info.id}: DOUBLED ALL DOOM ATK!`);
+    }
+    // Corrupt soup
+    if (e.corruptSoup) {
+      (isPlayer ? setOppSoup : setSoup)(s => ({ ...s, max: Math.max(0, s.max - 1), current: Math.max(0, s.current - 1) }));
+      addLog(`[EFFECT] ${info.id}: CORRUPTED 1 ENEMY SOUP CAN`);
+    }
+    // Sacrifice for effect: sacrifice 1 own card to get a benefit
+    if (e.sacrificeForEffect) {
+      (isPlayer ? setPlayArea : setOppPlayArea)(prev => {
+        if (prev.length <= 1) return prev; // Don't sacrifice self
+        const sacrificeIdx = prev.findIndex(c => c.cardId !== info.id && !c.cardId.startsWith('TOKEN'));
+        if (sacrificeIdx === -1) return prev;
+        const sacrificed = prev[sacrificeIdx];
+        (isPlayer ? setGrave : setOppGrave)(g => [...g, sacrificed.cardId]);
+        addLog(`[EFFECT] ${info.id}: SACRIFICED ${sacrificed.cardId}`);
+        return prev.filter((_, i) => i !== sacrificeIdx);
+      });
+    }
   }, [addLog, drawCard]);
 
   const runOnDeath = useCallback((cardId, isPlayer) => {
@@ -379,8 +499,21 @@ function App() {
     }
   }, [addLog]);
 
-  const runOnAttack = useCallback((cardId, isPlayer) => {
+  const runOnAttack = useCallback((cardId, isPlayer, cardInstanceId) => {
     const e = parseCardData(cardId).effects;
+
+    // Once-per-turn enforcement
+    if (e.oncePerTurn && cardInstanceId) {
+      const setArea = isPlayer ? setPlayArea : setOppPlayArea;
+      let alreadyUsed = false;
+      setArea(prev => {
+        const card = prev.find(c => c.id === cardInstanceId);
+        if (card && card.usedTurnEffect) { alreadyUsed = true; }
+        return prev.map(c => c.id === cardInstanceId ? { ...c, usedTurnEffect: true } : c);
+      });
+      if (alreadyUsed) { addLog(`[ATK] ${cardId}: ONCE PER TURN ALREADY USED`); return; }
+    }
+
     if (e.onAttackDiscardOpp) {
       (isPlayer ? setOppHand : setHand)(h => { if (!h.length) return h; const n = [...h]; n.pop(); return n; });
       addLog(`[ATK] ${cardId}: FORCED DISCARD`);
@@ -434,6 +567,18 @@ function App() {
       addLog(`> PLAYER PLAYED SOUP`); return;
     }
     if (soup.current < card.cost) { addLog(`! INSUFFICIENT SOUP (need ${card.cost})`); return; }
+    // Sacrifice requirement check
+    if (card.effects.requiresSacrifice) {
+      const type = card.effects.sacrificeType || '';
+      const ownCreatures = playArea.filter(c => {
+        if (!type) return c.cardId !== '0' && !c.cardId.startsWith('TOKEN');
+        return parseCardData(c.cardId).rawText.toLowerCase().includes(type);
+      });
+      if (ownCreatures.length < card.effects.requiresSacrifice) {
+        addLog(`! NEED ${card.effects.requiresSacrifice} ${type.toUpperCase()} CARDS TO SACRIFICE`);
+        return;
+      }
+    }
     setSoup(s => ({ ...s, current: s.current - card.cost }));
     setHand(h => { const n = [...h]; n.splice(index, 1); return n; });
     setExecutionStack(prev => [...prev, { owner: 'PLAYER', cardId }]);
@@ -446,10 +591,42 @@ function App() {
     stack.forEach(item => {
       const card = parseCardData(item.cardId);
       if (card.isCreature) {
-        const obj = { id: Math.random().toString(), cardId: item.cardId, canAttack: true, isAttacking: false, blockedBy: null, atkMod: 0 };
-        if (item.owner === 'PLAYER') { addP.push(obj); addLog(`> SUMMONED: ${card.id}`); }
-        else { addO.push(obj); addLog(`> AI SUMMONED: ${card.id}`); }
-        runOnSummon(card, item.owner === 'PLAYER');
+        const obj = { id: Math.random().toString(), cardId: item.cardId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, usedOnceEffect: false, usedTurnEffect: false };
+        if (item.owner === 'PLAYER') { 
+          addP.push(obj); 
+          addLog(`> SUMMONED: ${card.id}`);
+          // Execute sacrifice if needed
+          if (card.effects.requiresSacrifice) {
+            let rem = card.effects.requiresSacrifice, type = card.effects.sacrificeType;
+            setPlayArea(prev => {
+              const res = []; 
+              for (const c of prev) {
+                if (rem > 0 && (type ? parseCardData(c.cardId).rawText.toLowerCase().includes(type) : (c.cardId !== '0' && !c.cardId.startsWith('TOKEN'))))
+                  { setGrave(g => [...g, c.cardId]); addLog(`[SACRIFICE] ${c.cardId} sacrificed`); rem--; }
+                else res.push(c);
+              }
+              return res;
+            });
+          }
+        }
+        else { 
+          addO.push(obj); 
+          addLog(`> AI SUMMONED: ${card.id}`);
+          // Execute AI sacrifice if needed
+          if (card.effects.requiresSacrifice) {
+            let rem = card.effects.requiresSacrifice, type = card.effects.sacrificeType;
+            setOppPlayArea(prev => {
+              const res = [];
+              for (const c of prev) {
+                if (rem > 0 && (type ? parseCardData(c.cardId).rawText.toLowerCase().includes(type) : (c.cardId !== '0' && !c.cardId.startsWith('TOKEN')))) 
+                  { setOppGrave(g => [...g, c.cardId]); addLog(`[AI SACRIFICE] ${c.cardId} sacrificed`); rem--; }
+                else res.push(c);
+              }
+              return res;
+            });
+          }
+        }
+        runOnSummon(card, item.owner === 'PLAYER', obj.id);
       } else {
         // Spell/Instant
         if (item.owner === 'PLAYER') setGrave(g => [...g, item.cardId]);
@@ -464,7 +641,7 @@ function App() {
             addLog(`> COUNTER: NO TARGET`); return prev;
           });
         }
-        runOnSummon(card, item.owner === 'PLAYER');
+        runOnSummon(card, item.owner === 'PLAYER', null);
         addLog(`> SPELL RESOLVED: ${card.id}`);
       }
     });
@@ -543,7 +720,7 @@ function App() {
 
     setPlayArea(pF);
     setOppPlayArea(oF);
-    attackerCardIds.forEach(cid => runOnAttack(cid, true));
+    attackers.forEach(a => runOnAttack(a.cardId, true, a.id));
     setTimeout(() => resolveCombat(), 800);
   };
 
@@ -574,7 +751,7 @@ function App() {
       nO.forEach((a, i) => {
         if (!a.isAttacking) return;
         const ai = parseCardData(a.cardId);
-        runOnAttack(a.cardId, false);
+        runOnAttack(a.cardId, false, a.id);
         if (a.blockedBy) {
           const bi = nP.findIndex(c => c.id === a.blockedBy);
           if (bi > -1) {
@@ -597,7 +774,8 @@ function App() {
     if (!gsRef.current || winRef.current !== null) return;
     if (turn === 'PLAYER' && phase === 'MAIN') {
       setSoup(s => ({ ...s, current: s.max }));
-      setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null })));
+      setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false })));
+      setOppPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
       drawCard(true);
       addLog(">> YOUR TURN. READY.");
     }
@@ -615,7 +793,8 @@ function App() {
       if (!live || winRef.current !== null) return;
 
       // Reset AI creatures
-      setOppPlayArea(prev => prev.map(o => ({ ...o, canAttack: true, isAttacking: false, blockedBy: null })));
+      setOppPlayArea(prev => prev.map(o => ({ ...o, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false })));
+      setPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
       drawCard(false);
 
       await new Promise(r => setTimeout(r, 700));
@@ -638,12 +817,19 @@ function App() {
         let affordable = [];
         currentHand.forEach(c => {
           const info = parseCardData(c);
-          if (info.cost > 0 && info.cost <= locSoup) affordable.push({ c, info });
+          if (info.cost > 0 && info.cost <= locSoup) {
+            // Check sacrifice
+            if (info.effects.requiresSacrifice) {
+              const type = info.effects.sacrificeType || '';
+              const matches = oRef.current.filter(x => type ? parseCardData(x.cardId).rawText.toLowerCase().includes(type) : (x.cardId !== "0" && !x.cardId.startsWith("TOKEN")));
+              if (matches.length < info.effects.requiresSacrifice) return;
+            }
+            affordable.push({ c, info });
+          }
         });
         if (!affordable.length) break;
         affordable.sort((a, b) => b.info.cost - a.info.cost);
         const pick = affordable[0];
-        if (pick.info.cost > locSoup) break;
         locSoup -= pick.info.cost;
         pending.push({ owner: 'AI', cardId: pick.c });
         currentHand.splice(currentHand.indexOf(pick.c), 1);
@@ -722,7 +908,7 @@ function App() {
           <div style={{ background: 'rgba(255,0,255,0.2)', padding: 5, marginTop: 5, border: '1px dotted #f0f' }}>
             <div style={{ color: '#f0f', fontSize: 10 }}>ENGINE MODULES:</div>
             <ul style={{ margin: '2px 0 0 15px', color: '#fff', fontSize: 11 }}>
-              {efx.map(([k, v]) => <li key={k}>{k}: {typeof v === 'boolean' ? '✓' : v}</li>)}
+              {efx.map(([k, v]) => <li key={k}>{k}: {typeof v === 'boolean' ? '✓' : (typeof v === 'object' ? JSON.stringify(v) : v)}</li>)}
             </ul>
           </div>
         )}
