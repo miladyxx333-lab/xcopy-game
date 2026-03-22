@@ -72,9 +72,16 @@ const parseCardData = (id) => {
     e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
   else if (/(\d+) damage to.*opponent.*life|(\d+) damage to opponent/i.test(eff))
     e.onSummonDmgPlayer = parseInt((eff.match(/(\d+) damage/i) || [0, 2])[1]);
-  if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/attack/i.test(eff) && !/end of/i.test(eff)) {
-    e.onSummonDmgTargetEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-    if (/of your choice/i.test(eff)) e.targetChoice = true;
+  if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/end of/i.test(eff)) {
+    const amt = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
+    if (/once per turn/i.test(eff)) {
+      e.onAttackDmgTarget = amt;
+      e.oncePerTurn = true;
+      if (/of your choice/i.test(eff)) e.targetChoice = true;
+    } else if (!/attack/i.test(eff)) {
+      e.onSummonDmgTargetEnemy = amt;
+    }
+    if (/of your choice/i.test(eff) && !e.onAttackDmgTarget) e.targetChoice = true;
   }
 
   // Destroy cards
