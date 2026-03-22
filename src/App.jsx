@@ -101,7 +101,7 @@ const parseCardData = (id) => {
     e.onSummonDestroyByDef = parseInt((eff.match(/(\d+) or less/i) || eff.match(/less than (\d+)/i) || [0, 3])[1]);
   if (/destroy.*strongest|destroy.*highest/i.test(eff))
     e.onSummonDestroyStrongest = true;
-  if (/destroy (\d+).*card.*opponent/i.test(eff) && !e.onSummonDestroyTypeFly && !e.onSummonDestroyTypeDeath && !e.onSummonDestroyByCost && !e.onSummonDestroyStrongest)
+  if (/destroy (\d+).*random.*(enemy|opponent)/i.test(eff) && !e.onSummonDestroyTypeFly && !e.onSummonDestroyTypeDeath && !e.onSummonDestroyByCost && !e.onSummonDestroyStrongest)
     e.onSummonDestroyRandom = parseInt((eff.match(/destroy (\d+)/i) || [0, 1])[1]);
 
   // Reduce enemy attack
