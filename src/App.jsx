@@ -83,8 +83,8 @@ const parseCardData = (id) => {
     e.onSummonDmgAllEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
   else if (/deal (\d+) damage to all card/i.test(eff))
     e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-  else if (/(\d+) damage to.*opponent.*life|(\d+) damage to opponent/i.test(eff))
-    e.onSummonDmgPlayer = parseInt((eff.match(/(\d+) damage/i) || [0, 2])[1]);
+  else if (/(\d+) damage to.*(opponent|enemy|player).*(life|health|hp)/i.test(eff) || /(\d+) damage to the opponent/i.test(eff))
+    e.onSummonDmgPlayer = parseInt((eff.match(/(\d+)/) || [0, 5])[1]);
   if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/end of/i.test(eff)) {
     const amt = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
     if (/once per turn/i.test(eff)) {
