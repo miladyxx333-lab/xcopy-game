@@ -194,7 +194,7 @@ const parseCardData = (id) => {
   if (/once per turn/i.test(eff)) e.oncePerTurn = true;
 
   // ====== WHEEL / DISCARD ALL ======
-  if (/discard your opponent's entire hand/i.test(eff))
+  if (/discard.*entire.*hand/i.test(eff) || /hand.*reset/i.test(eff) || /wheel/i.test(eff))
     e.onSummonWheel = true;
 
   // ====== SEARCH DECK / LIBRARY ======
@@ -492,8 +492,9 @@ function App() {
     if (e.onSummonWheel) {
       const setOppH = isPlayer ? setOppHand : setHand;
       setOppH([]);
+      // Draw 5 for the opponent
       for (let i = 0; i < 5; i++) drawCard(!isPlayer);
-      addLog(`[EFFECT] ${info.id}: WHEEL! OPPONENT HAND RESET TO 5`);
+      addLog(`[WHEEL] ${info.id}: OPPONENT HAND HAS BEEN RELOADED!`);
     }
     // Return all graveyard cards to hand (#120)
     if (e.onSummonReturnAllGrave) {
