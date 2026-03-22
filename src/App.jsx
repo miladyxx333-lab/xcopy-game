@@ -209,10 +209,16 @@ const parseCardData = (id) => {
   }
 
   // ====== ACTIVATED ABILITIES (V10) ======
-  if (/pay (\d+) (energy|can)/i.test(eff)) {
-     const payCost = parseInt((eff.match(/pay (\d+)/i) || [0, 1])[1]);
+  if (/pay (\d+) (energy|can)|sacrifice.*summon/i.test(eff)) {
+     const payCostM = eff.match(/pay (\d+)/i);
+     const payCost = payCostM ? parseInt(payCostM[1]) : 0;
      e.activatedAbility = { cost: payCost };
-     if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt(eff.match(/deal (\d+)/i)[1]);
+     if (/sacrifice.*summon/i.test(eff)) {
+        const sm = eff.match(/summon.*?(\d+)\/(\d+)/i);
+        e.activatedAbility.sacrifice = 1;
+        if (sm) e.activatedAbility.summon = { atk: +sm[1], def: +sm[2] };
+     }
+     if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
      if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
      if (/discard/i.test(eff)) e.activatedAbility.discard = 2;
   }
@@ -1155,6 +1161,23 @@ function App() {
           return n;
        });
     }
+    if (abil.sacrifice && abil.summon) {
+       const setArea = isP ? setPlayArea : setOppPlayArea;
+       const setG = isP ? setGrave : setOppGrave;
+       setArea(prev => {
+          if (prev.length < 2) { addLog("! NOT ENOUGH CREATURES TO SACRIFICE"); return prev; }
+          const others = prev.filter(c => c.id !== cardInstanceId);
+          const sacIdx = Math.floor(Math.random() * others.length);
+          const sacCard = others[sacIdx];
+          setG(g => [...g, sacCard.cardId]);
+          addLog(`[SACRIFICE] CONSUMED ${sacCard.cardId}`);
+          
+          const tokenAtk = abil.summon.atk;
+          const tokenDef = abil.summon.def;
+          const tokenId = `TOKEN_${tokenAtk}_${tokenDef}_DOOM`;
+          return [...prev.filter(c => c.id !== sacCard.id), { id: Math.random().toString(), cardId: tokenId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, defMod: 0 }];
+       });
+    }
   };
 
   useEffect(() => {
@@ -1237,12 +1260,12 @@ function App() {
         {zBtn(obj.cardId)}
         {!isSoup && <div style={{ position: 'absolute', bottom: 0, background: 'rgba(0,0,0,0.8)', width: '100%', fontSize: 8, color: isOpp ? '#f00' : '#0ff' }}>ATK:{ci.attack} DEF:{ci.defense}</div>}
         {obj.blockedBy && <div style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,0,255,0.8)', padding: 2, fontSize: 9, color: '#fff' }}>BLOCKED</div>}
-        {ci.effects.activatedAbility && turn === (isOpp ? 'AI' : 'PLAYER') && (
+        {ci.effects.activatedAbility && turn === (isOpp ? 'AI' : 'PLAYER') && (!ci.effects.oncePerGame || !obj.usedOnceEffect) && (
            <button 
              onClick={(e) => { e.stopPropagation(); useAbility(obj.id, !isOpp); }} 
-             style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'var(--neon-pink)', border: 'none', color: '#fff', fontSize: 10, borderRadius: '4px', cursor: 'pointer', boxShadow: '0 0 10px #f0f', padding: '2px 5px' }}
+             style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: ci.effects.activatedAbility.sacrifice ? 'var(--neon-cyan)' : 'var(--neon-pink)', border: 'none', color: '#000', fontSize: 10, borderRadius: '4px', cursor: 'pointer', boxShadow: '0 0 10px #f0f', padding: '2px 5px', fontWeight: 'bold' }}
            >
-             PAY {ci.effects.activatedAbility.cost} ⚡️
+             {ci.effects.activatedAbility.sacrifice ? 'SACRIFICE' : `PAY ${ci.effects.activatedAbility.cost} ⚡️`}
            </button>
         )}
       </div>
