@@ -71,6 +71,8 @@ const parseCardData = (id) => {
     else { e.onSummonDiscardOpp = amt; }
   }
 
+  if (/freeze.*one.*enemy/i.test(eff)) e.onAttackFreezeEnemy = true;
+
   // Damage: all enemy > all cards > player HP > single target
   if (/deal (\d+) damage to all.*enem|deal (\d+) damage to all.*opponent/i.test(eff))
     e.onSummonDmgAllEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
@@ -307,8 +309,14 @@ function App() {
   const [log, setLog] = useState(["XCOPY_ARENA_OS_v12.0 // SYSTEM_READY.", "THE USELESS LOCKDOWN HAS BEEN ARMED."]);
 
   useEffect(() => {
-    if (turn === 'PLAYER' && gameStarted) setPLockSummon(prev => Math.max(0, prev - 1));
-    if (turn === 'AI' && gameStarted) setOLockSummon(prev => Math.max(0, prev - 1));
+    if (!gameStarted) return;
+    if (turn === 'PLAYER') {
+       setPLockSummon(prev => Math.max(0, prev - 1));
+       setPlayArea(prev => prev.map(c => ({ ...c, frozen: false })));
+    } else {
+       setOLockSummon(prev => Math.max(0, prev - 1));
+       setOppPlayArea(prev => prev.map(c => ({ ...c, frozen: false })));
+    }
   }, [turn, gameStarted]);
 
   const [selectedBlocker, setSelectedBlocker] = useState(null);
@@ -786,14 +794,15 @@ function App() {
       (isPlayer ? setOppHp : setHp)(h => Math.max(0, h - e.onAttackDmgPlayer));
       addLog(`[ATK] ${cardId}: ${e.onAttackDmgPlayer} EXTRA DMG`);
     }
-    if (e.onAttackDmgAllEnemy) {
-      const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
-      const setEGrave = isPlayer ? setOppGrave : setGrave;
-      setEnemy(prev => prev.filter(c => {
-        if (parseCardData(c.cardId).defense <= e.onAttackDmgAllEnemy) { setEGrave(g => [...g, c.cardId]); return false; }
-        return true;
-      }));
-      addLog(`[ATK] ${cardId}: AOE ${e.onAttackDmgAllEnemy} DMG`);
+    if (e.onAttackFreezeEnemy) {
+       const setEnemyEdge = isPlayer ? setOppPlayArea : setPlayArea;
+       const enemyArea = isPlayer ? oppPlayArea : playArea;
+       if (enemyArea.length > 0) {
+          let maxAtk = -1, idx = 0;
+          enemyArea.forEach((c, i) => { const a = parseCardData(c.cardId).attack; if (a > maxAtk) { maxAtk = a; idx = i; } });
+          addLog(`[FREEZE] ❄️ ${enemyArea[idx].cardId} HAS BEEN STUNNED!`);
+          setEnemyEdge(prev => prev.map((c, i) => i === idx ? { ...c, frozen: true } : c));
+       }
     }
     if (e.onAttackSummonToken) {
       const tkId = `TOKEN_${e.onAttackSummonToken.atk}_${e.onAttackSummonToken.def}`;
@@ -929,6 +938,7 @@ function App() {
   // ---- ATTACK/BLOCK ----
   const toggleAttack = (index) => {
     if (turn !== 'PLAYER' || phase !== 'DECLARE_ATTACKS') return;
+    if (playArea[index].frozen) { addLog("! CARD IS FROZEN ❄️"); return; }
     setPlayArea(prev => {
       const n = [...prev]; if (!n[index].canAttack || n[index].cardId === "0") return n;
       n[index] = { ...n[index], isAttacking: !n[index].isAttacking }; return n;
@@ -936,6 +946,7 @@ function App() {
   };
   const selectBlocker = (index) => {
     if (turn !== 'AI' || phase !== 'DECLARE_BLOCKS') return;
+    if (playArea[index].frozen) { addLog("! TARGET IS FROZEN ❄️"); return; }
     if (!playArea[index].canAttack || playArea[index].cardId === "0") return;
     setSelectedBlocker(index);
     addLog("> SELECT ENEMY ATTACKER TO BLOCK");
@@ -1308,14 +1319,15 @@ function App() {
         className={`card-placeholder ${isSoup ? 'card-soup neon-border-green' : 'card-field'} ${obj.isAttacking ? 'neon-border-pink' : (isOpp ? 'neon-border-red' : 'neon-border-cyan')}`}
         style={{
           position: 'relative', backgroundImage: `url(/cards/${obj.cardId}.png)`,
-          opacity: isSoup || obj.canAttack ? 1 : (obj.silenced ? 0.3 : 0.5),
-          filter: obj.silenced ? 'grayscale(0.8)' : 'none',
+          opacity: isSoup || obj.canAttack ? 1 : (obj.silenced ? 0.3 : (obj.frozen ? 0.6 : 0.5)),
+          filter: obj.silenced ? 'grayscale(0.8)' : (obj.frozen ? 'hue-rotate(180deg) brightness(1.2)' : 'none'),
           transform: obj.isAttacking ? (isOpp ? 'translateY(20px)' : 'translateY(-20px)') : 'none',
-          boxShadow: isTarget ? '0 0 15px #f0f' : (isSel ? '0 0 15px #0ff' : ''),
+          boxShadow: obj.frozen ? '0 0 15px #0ff' : (isTarget ? '0 0 15px #f0f' : (isSel ? '0 0 15px #0ff' : '')),
           cursor: isTarget || (!isSoup && obj.canAttack && (phase === 'DECLARE_ATTACKS' || phase === 'DECLARE_BLOCKS')) ? 'pointer' : 'default',
         }}>
         {zBtn(obj.cardId)}
         {obj.silenced && <div style={{ position: 'absolute', top: 5, right: 5, fontSize: 16 }}>📵</div>}
+        {obj.frozen && <div style={{ position: 'absolute', bottom: 5, left: 5, fontSize: 16 }}>❄️</div>}
         {!isSoup && <div style={{ position: 'absolute', bottom: 0, background: 'rgba(0,0,0,0.8)', width: '100%', fontSize: 8, color: isOpp ? '#f00' : '#0ff' }}>ATK:{ci.attack} DEF:{ci.defense}</div>}
         {obj.blockedBy && <div style={{ position: 'absolute', top: 0, right: 0, background: 'rgba(255,0,255,0.8)', padding: 2, fontSize: 9, color: '#fff' }}>BLOCKED</div>}
         {ci.effects.activatedAbility && turn === (isOpp ? 'AI' : 'PLAYER') && (!ci.effects.oncePerGame || !obj.usedOnceEffect) && (
