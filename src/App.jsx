@@ -225,6 +225,10 @@ const parseCardData = (id) => {
      if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
      if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
   }
+  
+  if (/no cards can be summoned/i.test(eff)) e.onSummonLock = 1;
+  
+  if (/no cards can be summoned/i.test(eff)) e.onSummonLock = 1;
 
   // ====== LIMITERS ======
   if (/once per game/i.test(eff)) e.oncePerGame = true;
@@ -298,7 +302,14 @@ function App() {
   const [oppSoup, setOppSoup] = useState({ current: 0, max: 0 });
 
   const [executionStack, setExecutionStack] = useState([]);
-  const [log, setLog] = useState(["SYSTEM_ONLINE // ENGINE V5.0 (FULL EFFECTS)", "ALL CARD ABILITIES MAPPED & ARMED."]);
+  const [pLockSummon, setPLockSummon] = useState(0);
+  const [oLockSummon, setOLockSummon] = useState(0);
+  const [log, setLog] = useState(["XCOPY_ARENA_OS_v12.0 // SYSTEM_READY.", "THE USELESS LOCKDOWN HAS BEEN ARMED."]);
+
+  useEffect(() => {
+    if (turn === 'PLAYER' && gameStarted) setPLockSummon(prev => Math.max(0, prev - 1));
+    if (turn === 'AI' && gameStarted) setOLockSummon(prev => Math.max(0, prev - 1));
+  }, [turn, gameStarted]);
 
   const [selectedBlocker, setSelectedBlocker] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -447,11 +458,26 @@ function App() {
        setHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
        setOppHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
     }
+    if (e.onSummonLock) {
+       if (isPlayer) setOLockSummon(e.onSummonLock);
+       else setPLockSummon(e.onSummonLock);
+       addLog(`[STASIS] ${info.id}: SUMMONING PROTOCOLS DISABLED FOR 1 TURN!`);
+    }
     if (e.onSummonWheel) {
       const setOppH = isPlayer ? setOppHand : setHand;
       setOppH([]);
       for (let i = 0; i < 5; i++) drawCard(!isPlayer);
       addLog(`[WHEEL] ${info.id}: OPPONENT HAND HAS BEEN RELOADED!`);
+    }
+    if (e.onSummonLock) {
+       if (isPlayer) setOLockSummon(e.onSummonLock);
+       else setPLockSummon(e.onSummonLock);
+       addLog(`[STASIS] ${info.id}: SUMMONING PROTOCOLS DISABLED FOR 1 TURN!`);
+    }
+    if (e.onSummonLock) {
+       if (isPlayer) setOLockSummon(e.onSummonLock);
+       else setPLockSummon(e.onSummonLock);
+       addLog(`[STASIS] ${info.id}: SUMMON LOOCK PROTOCOLS DISABLED FOR 1 TURN!`);
     }
     if (e.onSummonDestroyStrongest) {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
@@ -795,12 +821,9 @@ function App() {
     const card = parseCardData(cardId);
     const isCounter = card.effects.onSummonCounter || card.effects.isCounter;
     
-    // Stack Response: allow Counter if stack has items
-    if (executionStack.length > 0 && !isCounter) {
-      addLog("! STACK BUSY. WAIT FOR RESOLUTION."); 
-      return; 
-    }
-
+    // Summon Lock Check
+    if (pLockSummon > 0 && !isCounter && cardId !== "0") { addLog("! SUMMON LOCK ACTIVE: PROTOCOLS DISABLED"); return; }
+    
     const canPlay = (turn === 'PLAYER' && phase === 'MAIN') || (turn === 'AI' && phase === 'DECLARE_BLOCKS' && card.effects.isInstant) || isCounter;
     if (!canPlay) return;
 
