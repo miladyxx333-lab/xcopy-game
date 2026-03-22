@@ -401,7 +401,9 @@ function App() {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
       const setEGrave = isPlayer ? setOppGrave : setGrave;
       setEnemy(prev => prev.filter(c => {
-        if (parseCardData(c.cardId).defense <= e.onSummonDmgAllEnemy) { setEGrave(g => [...g, c.cardId]); addLog(`[EFFECT] AOE KILLED ${c.cardId}`); return false; }
+        const d = parseCardData(c.cardId).defense;
+        if (d <= e.onSummonDmgAllEnemy) { setEGrave(g => [...g, c.cardId]); addLog(`[EFFECT] AOE KILLED ${c.cardId}`); return false; }
+        addLog(`[EFFECT] ${c.cardId} SURVIVED AOE (DEF ${d} > DMG ${e.onSummonDmgAllEnemy})`);
         return true;
       }));
     }
