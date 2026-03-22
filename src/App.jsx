@@ -156,6 +156,7 @@ const parseCardData = (id) => {
     const tm = eff.match(/summon.*?(\d+)\/(\d+)/i);
     if (tm) e.onAttackSummonToken = { atk: +tm[1], def: +tm[2] };
   }
+  if (/attack.*remove.*(card|random).*deck/i.test(eff)) e.onAttackMillOpp = 1;
   if (/freeze/i.test(eff) && /attack/i.test(eff)) e.onAttackFreeze = true;
   if (/gain.*\+(\d+) attack/i.test(eff) && /attack/i.test(eff) && !/summon/i.test(eff))
     e.onAttackSelfBuff = parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]);
@@ -827,6 +828,17 @@ function App() {
       const token = { id: Math.random().toString(), cardId: tkId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0 };
       (isPlayer ? setPlayArea : setOppPlayArea)(prev => [...prev, token]);
       addLog(`[ATK] ${cardId}: SPAWNED ${e.onAttackSummonToken.atk}/${e.onAttackSummonToken.def} TOKEN`);
+    }
+    if (e.onAttackMillOpp) {
+       const setD = isPlayer ? setOppDeck : setDeck;
+       const setG = isPlayer ? setOppGrave : setGrave;
+       setD(prev => {
+          if (!prev.length) return prev;
+          const removed = prev[Math.floor(Math.random() * prev.length)];
+          setG(g => [...g, removed]);
+          return prev.filter(c => c !== removed);
+       });
+       addLog(`[VOID] 🌑 ${cardId} CONSUMED 1 CARD FROM ENEMY LIBRARY`);
     }
     if (e.onAttackFreeze) {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
