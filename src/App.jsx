@@ -78,8 +78,13 @@ const parseCardData = (id) => {
 
   // Destroy cards
   if (/destroy all.*fly/i.test(eff)) e.onSummonDestroyTypeFly = true;
+  else if (/destroy (one|1|a).*fly/i.test(eff)) e.onSummonDestroyOneFly = true;
+
   if (/destroy all.*death/i.test(eff)) e.onSummonDestroyTypeDeath = true;
-  if (/destroy all.*doom/i.test(eff)) e.onSummonDestroyTypeDoom = true;
+  else if (/destroy (one|1|a).*death/i.test(eff)) e.onSummonDestroyOneDeath = true;
+
+  if (/destroy all.*doom|doom.*destroy/i.test(eff)) e.onSummonDestroyTypeDoom = true;
+  else if (/destroy (one|1|a).*doom/i.test(eff)) e.onSummonDestroyOneDoom = true;
   if (/destroy all.*cost.*less than (\d+)|destroy all.*cost.*(\d+) or less/i.test(eff))
     e.onSummonDestroyByCost = parseInt((eff.match(/less than (\d+)|(\d+) or less/i) || [0, 5])[1] || 5);
   if (/(\d+) or less (attack|defense)|less than (\d+) attack/i.test(eff))
@@ -403,9 +408,27 @@ function App() {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
       const setEGrave = isPlayer ? setOppGrave : setGrave;
       setEnemy(prev => prev.filter(c => {
-        if (parseCardData(c.cardId).rawText.toLowerCase().includes(type)) { setEGrave(g => [...g, c.cardId]); addLog(`[EFFECT] DESTROYED ${type.toUpperCase()}: ${c.cardId}`); return false; }
+        const pd = parseCardData(c.cardId);
+        if (pd.cardType === type || pd.rawText.toLowerCase().includes(type)) { setEGrave(g => [...g, c.cardId]); addLog(`[EFFECT] DESTROYED ${type.toUpperCase()}: ${c.cardId}`); return false; }
         return true;
       }));
+    }
+    if (e.onSummonDestroyOneFly || e.onSummonDestroyOneDeath || e.onSummonDestroyOneDoom) {
+      const type = e.onSummonDestroyOneFly ? 'fly' : e.onSummonDestroyOneDeath ? 'death' : 'doom';
+      const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
+      const setEGrave = isPlayer ? setOppGrave : setGrave;
+      setEnemy(prev => {
+        const idx = prev.findIndex(c => {
+          const pd = parseCardData(c.cardId);
+          return pd.cardType === type || pd.rawText.toLowerCase().includes(type);
+        });
+        if (idx > -1) {
+          setEGrave(g => [...g, prev[idx].cardId]);
+          addLog(`[EFFECT] ${info.id}: DESTROYED ONE ${type.toUpperCase()} CARD`);
+          return prev.filter((_, i) => i !== idx);
+        }
+        return prev;
+      });
     }
     if (e.onSummonReduceAtk) {
       (isPlayer ? setOppPlayArea : setPlayArea)(prev => prev.map(c => ({ ...c, atkMod: (c.atkMod || 0) - e.onSummonReduceAtk })));
