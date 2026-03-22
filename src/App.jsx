@@ -40,7 +40,8 @@ const parseCardData = (id) => {
   else if (txt.includes('death')) cardType = 'death';
   else if (txt.includes('legendary')) cardType = 'legendary';
 
-  const isCreature = (atk > 0 || def > 0) && id !== "0";
+  const isFragment = txt.includes('fragment') || txt.includes('creation');
+  const isCreature = ((atk > 0 || def > 0) || (id !== "0" && isFragment)) && id !== "0";
   const isSpell = !isCreature && id !== "0";
 
   // ---------- EFFECT CLASSIFICATION V6 (COMPREHENSIVE) ----------
@@ -161,6 +162,10 @@ const parseCardData = (id) => {
   if (/cannot be destroyed/i.test(eff)) e.isImmune = true;
   if (/cannot be blocked by death/i.test(eff)) e.unblockableByDeath = true;
   if (/prevent all damage/i.test(eff)) e.hasShield = true;
+
+  // ====== WIN CONDITION (FRAGMENTS) ======
+  if (/combined.*fragment.*win.*game/i.test(eff) || /fragments?.*creation.*win.*game/i.test(eff))
+    e.winCombo = true;
 
   // ====== LIMITERS ======
   if (/once per game/i.test(eff)) e.oncePerGame = true;
@@ -454,6 +459,30 @@ function App() {
         return d;
       });
       addLog(`[EFFECT] ${info.id}: SEARCHED LIBRARY & DREW 1 CARD`);
+    }
+    // Win Combo: Fragments of Creation
+    if (e.winCombo) {
+      const myHand = isPlayer ? handRef.current : oppHandRef.current;
+      const myField = isPlayer ? pRef.current : oRef.current;
+      const allCards = [...myHand, ...myField.map(c => c.cardId)];
+      const fragmentsFound = new Set();
+      allCards.forEach(cid => {
+        if (!cid) return;
+        const d = parseCardData(cid);
+        if (d.effects.winCombo) {
+           // We identify fragments by their unique name keywords in rawText or ID
+           if (d.rawText.toLowerCase().includes('soul')) fragmentsFound.add('soul');
+           if (d.rawText.toLowerCase().includes('mind')) fragmentsFound.add('mind');
+           if (d.rawText.toLowerCase().includes('body')) fragmentsFound.add('body');
+           if (d.rawText.toLowerCase().includes('heart')) fragmentsFound.add('heart');
+           if (d.rawText.toLowerCase().includes('life')) fragmentsFound.add('life');
+        }
+      });
+      // If played card itself is one of them, it should be in fragmentsFound already (if it's on field)
+      if (fragmentsFound.size >= 5) {
+        addLog(`[ULTIMATE] FRAGMENTS OF CREATION ASSEMBLED!`);
+        setTimeout(() => setWinner(isPlayer ? 'PLAYER ONE' : 'AI OVERLORD'), 1000);
+      }
     }
     // Self-buff per type on field or hand (V7.1 Dynamic)
     if (e.selfBuffPerType) {
