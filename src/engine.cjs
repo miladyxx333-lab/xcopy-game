@@ -28,61 +28,59 @@ module.exports.parseCardData = (id) => {
   const e = {};
   const eff = (txt.match(/effect:([^]*?)(?:flavor|$)/i) || ['', txt])[1];
 
+  // PASSIVE TRIGGERS
+  if (/whenever.*destroyed/i.test(eff) || /when.*destroyed/i.test(eff)) {
+    if (/gain (\d+) soup/i.test(eff) || /gain (\d+) can/i.test(eff)) e.passiveOnDeathGainSoup = parseInt((eff.match(/gain (\d+)/i) || [0, 1])[1]);
+    if (/deal (\d+) damage to all/i.test(eff)) e.passiveOnDeathDmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
+    if (/heal|gain.*life/i.test(eff)) e.passiveOnDeathHeal = parseInt((eff.match(/(\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || [0, 2])[1]);
+    if (/death/i.test(eff)) e.passiveTriggerType = 'death';
+    else if (/fly/i.test(eff)) e.passiveTriggerType = 'fly';
+    else if (/doom/i.test(eff)) e.passiveTriggerType = 'doom';
+    else if (/enemy/i.test(eff)) e.passiveTriggerType = 'enemy';
+  }
+
+  // SUMMON EFFECTS
   if (/gain (\d+) soup/i.test(eff)) e.onSummonGainSoup = parseInt((eff.match(/gain (\d+) soup/i) || [0, 1])[1]);
   if (/draw (\d+) card/i.test(eff)) {
      const drawM = eff.match(/draw (\d+)/i);
      if (drawM && !/attack.*draw/i.test(eff) && !/opponent.*draw/i.test(eff)) e.onSummonDraw = parseInt(drawM[1]);
      if (/attack.*draw/i.test(eff)) e.onAttackDraw = parseInt(drawM[1]);
   }
-  if (/gain (\d+) extra life/i.test(eff) || /gain (\d+).*life/i.test(eff) || /heal.*?(\d+)/i.test(eff)) {
-    const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*life/i);
-    if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2]);
+  if (/heal|gain.*life|extra life/i.test(eff)) {
+    const healM = eff.match(/(\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*health/i);
+    if (healM) e.onSummonHeal = parseInt(healM[1]);
   }
-  if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff)) {
+  if (/discard.*opponent/i.test(eff)) {
     const discardM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*discard/i);
     const amt = discardM ? parseInt(discardM[1]) : 1;
     if (/once per turn/i.test(eff)) e.onAttackDiscardOpp = amt;
     else e.onSummonDiscardOpp = amt;
   }
-  if (/deal (\d+) damage to all.*enem|deal (\d+) damage to all.*opponent/i.test(eff))
-    e.onSummonDmgAllEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-  if (/deal (\d+) damage to all card/i.test(eff))
-    e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-  if (/(\d+) damage to.*opponent.*life|(\d+) damage to opponent/i.test(eff))
-    e.onSummonDmgPlayer = parseInt((eff.match(/(\d+) damage/i) || [0, 2])[1]);
-  if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/end of/i.test(eff)) {
+  if (/deal (\d+) damage to all.*enem/i.test(eff)) e.onSummonDmgAllEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
+  if (/deal (\d+) damage to all card/i.test(eff)) e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
+  if (/damage to.*opponent.*life|damage to opponent/i.test(eff)) e.onSummonDmgPlayer = parseInt((eff.match(/(\d+) damage/i) || [0, 2])[1]);
+  
+  if (/deal (\d+) damage/i.test(eff) && !/all/i.test(eff)) {
     const amt = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
     if (/once per turn/i.test(eff)) { e.onAttackDmgTarget = amt; e.oncePerTurn = true; }
     else if (!/attack/i.test(eff)) { e.onSummonDmgTargetEnemy = amt; }
-    if (/of your choice/i.test(eff)) e.targetChoice = true;
   }
-  if (/destroy all.*fly/i.test(eff)) e.onSummonDestroyTypeFly = true;
-  else if (/destroy (one|1|a).*fly/i.test(eff)) e.onSummonDestroyOneFly = true;
-  if (/destroy all.*death/i.test(eff)) e.onSummonDestroyTypeDeath = true;
-  else if (/destroy (one|1|a).*death/i.test(eff)) e.onSummonDestroyOneDeath = true;
-  if (/destroy all.*doom|doom.*destroy/i.test(eff)) e.onSummonDestroyTypeDoom = true;
-  else if (/destroy (one|1|a).*doom/i.test(eff)) e.onSummonDestroyOneDoom = true;
-  if (/destroy all.*creatures/i.test(eff)) e.onSummonDestroyAll = true;
-  if (/destroy.*strongest|destroy.*highest/i.test(eff)) e.onSummonDestroyStrongest = true;
-  if (/destroy (\d+).*random.*(enemy|opponent)/i.test(eff)) e.onSummonDestroyRandom = parseInt((eff.match(/destroy (\d+)/i) || [0, 1])[1]);
   
-  if (/summon.*?(\d+).*?(\d+)\/(\d+)/i.test(eff) && !/attack/i.test(eff) && !/destroyed/i.test(eff)) {
+  if (/destroy all.*fly/i.test(eff)) e.onSummonDestroyTypeFly = true;
+  if (/destroy all.*death/i.test(eff)) e.onSummonDestroyTypeDeath = true;
+  if (/destroy all.*doom/i.test(eff)) e.onSummonDestroyTypeDoom = true;
+  if (/destroy.*strongest/i.test(eff)) e.onSummonDestroyStrongest = true;
+  if (/summon/i.test(eff)) {
     const tm = eff.match(/summon.*?(\d+).*?(\d+)\/(\d+)/i);
     if (tm) e.onSummonToken = { count: +tm[1], atk: +tm[2], def: +tm[3] };
-  }
-  if (e.onSummonToken) {
-    if (/death/i.test(eff)) e.onSummonToken.type = 'death';
-    else if (/doom/i.test(eff)) e.onSummonToken.type = 'doom';
-    else if (/fly/i.test(eff)) e.onSummonToken.type = 'fly';
+    else if (/summon/i.test(eff)) e.onSummonTokenGeneric = true;
   }
 
-  if (/counter.*opponent.*card|negat.*opponent.*card/i.test(eff)) e.onSummonCounter = true;
-  if (/discard.*entire.*hand/i.test(eff)) e.onSummonWheel = true;
-  if (/combined.*fragment.*win.*game/i.test(eff) || /fragments?.*creation.*win.*game/i.test(eff)) e.winCombo = true;
-  if (/once per game/i.test(eff)) e.oncePerGame = true;
-  if (/once per turn/i.test(eff)) e.oncePerTurn = true;
+  if (/counter/i.test(eff)) e.onSummonCounter = true;
+  if (/discard.*entire.*hand|hand.*reset/i.test(eff)) e.onSummonWheel = true;
+  if (/combined.*fragment|fragments? of creation/i.test(eff)) e.winCombo = true;
 
-  if (isSpell && Object.keys(e).filter(k => k !== 'isInstant').length === 0) e.onSummonDmgPlayer = 2;
+  if (isSpell && Object.keys(e).length === 0) e.onSummonDmgPlayer = 2;
   e.isInstant = isSpell;
 
   return { id, cost, attack: atk, defense: def, isCreature, cardType, effects: e, rawText: c.rawText };

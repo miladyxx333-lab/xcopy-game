@@ -57,9 +57,9 @@ const parseCardData = (id) => {
   if (drawM && !/attack.*draw/i.test(eff) && !/opponent.*draw/i.test(eff))
     e.onSummonDraw = parseInt(drawM[1]);
 
-  if (/gain (\d+) extra life/i.test(eff) || /gain (\d+).*life/i.test(eff) || /heal.*?(\d+)/i.test(eff)) {
-    const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*life/i);
-    if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2]);
+  if (/gain (\d+) extra life|gain (\d+).*life|heal.*?(\d+)/i.test(eff)) {
+    const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*health/i) || eff.match(/(\d+).*life/i);
+    if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2] || healM[3]);
   }
 
   if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff)) {
@@ -111,15 +111,11 @@ const parseCardData = (id) => {
     e.onSummonReduceAtk = parseInt((eff.match(/(\d+)/i) || [0, 1])[1]);
 
   // Summon tokens on entry
-  if (/summon.*?(\d+).*?(\d+)\/(\d+)/i.test(eff) && !/attack/i.test(eff) && !/destroyed/i.test(eff)) {
+  if (/summon/i.test(eff) && !/attack|destroyed/i.test(eff)) {
     const tm = eff.match(/summon.*?(\d+).*?(\d+)\/(\d+)/i);
     if (tm) e.onSummonToken = { count: +tm[1], atk: +tm[2], def: +tm[3] };
-  } else if (/summon.*?(\d+)\/(\d+)/i.test(eff) && !/attack|destroyed/i.test(eff)) {
-    const tm = eff.match(/summon.*?(\d+)\/(\d+)/i);
-    if (tm) e.onSummonToken = { atk: +tm[1], def: +tm[2], count: parseInt((eff.match(/summon (\d+) /i) || [0, 1])[1]) };
-  } else if (/summon.*?(\d+).*?token/i.test(eff) && !/attack|destroyed/i.test(eff)) {
-    const tm = eff.match(/summon.*?(\d+).*?token/i);
-    if (tm) e.onSummonToken = { count: +tm[1], atk: 1, def: 1 };
+    else if (/death token/i.test(eff)) e.onSummonToken = { count: 2, atk: 1, def: 1, type: 'death' };
+    else e.onSummonTokenGeneric = true;
   }
   if (e.onSummonToken) {
     if (/death/i.test(eff)) e.onSummonToken.type = 'death';
@@ -189,8 +185,28 @@ const parseCardData = (id) => {
   if (/prevent all damage/i.test(eff)) e.hasShield = true;
 
   // ====== WIN CONDITION (FRAGMENTS) ======
-  if (/combined.*fragment.*win.*game/i.test(eff) || /fragments?.*creation.*win.*game/i.test(eff))
-    e.winCombo = true;
+  // ====== PASSIVE TRIGGERS (V9) ======
+  if (/whenever.*destroyed/i.test(eff) || /when.*destroyed/i.test(eff)) {
+    if (/gain (\d+) soup/i.test(eff) || /gain (\d+) can/i.test(eff)) {
+      e.passiveOnDeathGainSoup = parseInt((eff.match(/gain (\d+)/i) || [0, 1])[1]);
+    }
+    if (/deal (\d+) damage to all/i.test(eff)) {
+      e.passiveOnDeathDmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
+    }
+    if (/heal/i.test(eff) || /gain.*life/i.test(eff)) {
+      e.passiveOnDeathHeal = parseInt((eff.match(/(\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || [0, 2])[1]);
+    }
+    if (/death/i.test(eff)) e.passiveTriggerType = 'death';
+    else if (/fly/i.test(eff)) e.passiveTriggerType = 'fly';
+    else if (/doom/i.test(eff)) e.passiveTriggerType = 'doom';
+    else if (/enemy/i.test(eff)) e.passiveTriggerType = 'enemy';
+  }
+  if (/for every/i.test(eff)) {
+     e.onSummonBuffPerCount = parseInt((eff.match(/increase.*?by (\d+)/i) || [0, 1])[1]);
+     if (/doom/i.test(eff)) e.buffType = 'doom';
+     else if (/death/i.test(eff)) e.buffType = 'death';
+     else if (/fly/i.test(eff)) e.buffType = 'fly';
+  }
 
   // ====== LIMITERS ======
   if (/once per game/i.test(eff)) e.oncePerGame = true;
@@ -1057,7 +1073,46 @@ function App() {
     return () => { live = false; };
   }, [turn, phase, addLog, drawCard, forceResolveStack]);
 
-  // ---- WIN CHECK ----
+  // ---- GLOBAL WATCHER (V9 - CHAIN REACTIONS) ----
+  const [lastGraveLen, setLastGraveLen] = useState({ p: 0, o: 0 });
+  useEffect(() => {
+    if (grave.length === lastGraveLen.p && oppGrave.length === lastGraveLen.o) return;
+    
+    const wasP = grave.length > lastGraveLen.p;
+    const wasO = oppGrave.length > lastGraveLen.o;
+    const newCard = wasP ? grave[grave.length-1] : (wasO ? oppGrave[oppGrave.length-1] : null);
+    if (!newCard) return;
+
+    setLastGraveLen({ p: grave.length, o: oppGrave.length });
+    const cardData = parseCardData(newCard);
+    const type = cardData.cardType;
+
+    // Trigger passives on self field
+    const checkPassives = (isP) => {
+      const area = isP ? playArea : oppPlayArea;
+      area.forEach(obj => {
+        const ci = parseCardData(obj.cardId);
+        const p = ci.effects;
+        if (p.passiveOnDeathGainSoup || p.passiveOnDeathDmgAll || p.passiveOnDeathHeal) {
+           const matchType = (p.passiveTriggerType === 'enemy' && (isP ? wasO : wasP)) || (p.passiveTriggerType === type);
+           if (matchType || !p.passiveTriggerType) {
+              if (p.passiveOnDeathGainSoup) (isP ? setSoup : setOppSoup)(s => ({ ...s, current: s.current + p.passiveOnDeathGainSoup }));
+              if (p.passiveOnDeathHeal) (isP ? setHp : setOppHp)(h => h + p.passiveOnDeathHeal);
+              if (p.passiveOnDeathDmgAll) {
+                 const targetArea = isP ? setOppPlayArea : setPlayArea;
+                 const targetGrave = isP ? setOppGrave : setGrave;
+                 targetArea(prev => prev.filter(c => { 
+                    if (parseCardData(c.cardId).defense <= p.passiveOnDeathDmgAll) { targetGrave(g => [...g, c.cardId]); return false; } 
+                    return true; 
+                 }));
+                 addLog(`[CHAIN] ${ci.id} TRIGGERED BY ${newCard}`);
+              }
+           }
+        }
+      });
+    };
+    checkPassives(true); checkPassives(false);
+  }, [grave, oppGrave, playArea, oppPlayArea]);
   useEffect(() => {
     if (winner || !gameStarted) return;
     if (hp <= 0 && oppHp <= 0) setWinner('NEUTRALIZED (DRAW)');
