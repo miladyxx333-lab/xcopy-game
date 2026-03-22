@@ -15,7 +15,8 @@ const parseCardData = (id) => {
   if (!id) return { id: '??', rawText: '', cost: 0, attack: 0, defense: 0, isCreature: false, effects: {} };
   if (id.startsWith('TOKEN_')) {
     const m = id.match(/TOKEN_(\d+)_(\d+)/);
-    return { id, rawText: 'Token', cost: 0, attack: m ? +m[1] : 1, defense: m ? +m[2] : 1, isCreature: true, effects: {} };
+    const type = id.includes('_DEATH') ? 'death' : id.includes('_DOOM') ? 'doom' : id.includes('_FLY') ? 'fly' : 'neutral';
+    return { id, rawText: 'Token', cost: 0, attack: m ? +m[1] : 1, defense: m ? +m[2] : 1, isCreature: true, cardType: type, effects: {} };
   }
   const c = cardsData.find(c => c.id === id) || { id, rawText: 'No Data' };
   const txt = (c.rawText || '').toLowerCase();
@@ -108,6 +109,11 @@ const parseCardData = (id) => {
   } else if (/summon.*?(\d+).*?token/i.test(eff) && !/attack|destroyed/i.test(eff)) {
     const tm = eff.match(/summon.*?(\d+).*?token/i);
     if (tm) e.onSummonToken = { count: +tm[1], atk: 1, def: 1 };
+  }
+  if (e.onSummonToken) {
+    if (/death/i.test(eff)) e.onSummonToken.type = 'death';
+    else if (/doom/i.test(eff)) e.onSummonToken.type = 'doom';
+    else if (/fly/i.test(eff)) e.onSummonToken.type = 'fly';
   }
 
   // Buff own cards on summon
@@ -435,10 +441,20 @@ function App() {
     }
     if (e.onSummonToken) {
       const count = e.onSummonToken.count || 1;
-      const tkId = `TOKEN_${e.onSummonToken.atk}_${e.onSummonToken.def}`;
-      const tokens = Array.from({ length: count }, () => ({ id: Math.random().toString(), cardId: tkId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0 }));
+      const tkType = e.onSummonToken.type ? `_${e.onSummonToken.type.toUpperCase()}` : "";
+      const tkId = `TOKEN_${e.onSummonToken.atk}_${e.onSummonToken.def}${tkType}`;
+      const tokens = Array.from({ length: count }, () => ({ 
+        id: Math.random().toString(), 
+        cardId: tkId, 
+        canAttack: false, 
+        isAttacking: false, 
+        blockedBy: null, 
+        atkMod: 0,
+        usedOnceEffect: false,
+        usedTurnEffect: false
+      }));
       (isPlayer ? setPlayArea : setOppPlayArea)(prev => [...prev, ...tokens]);
-      addLog(`[EFFECT] ${info.id}: SUMMONED ${count}x ${e.onSummonToken.atk}/${e.onSummonToken.def} TOKEN`);
+      addLog(`[EFFECT] ${info.id}: SUMMONED ${count}x ${e.onSummonToken.atk}/${e.onSummonToken.def} ${e.onSummonToken.type || 'NEUTRAL'} TOKENS`);
     }
     if (e.onSummonBuffFly) {
       (isPlayer ? setPlayArea : setOppPlayArea)(prev => prev.map(c => {

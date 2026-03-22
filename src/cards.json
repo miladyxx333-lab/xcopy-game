@@ -42,7 +42,7 @@
   {
     "id": "105",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/105.png",
-    "rawText": "BE i ef\nTYPE: DEATH\nCost: 7 cans, Attack: 8, Defense\n6, Effect: Once per game,\nsummon 2 Death tokens to the\nbattlefield. Flavor Text: A knight\nrisen from the grave, bound by a\nvow to carry out its mission.\na"
+    "rawText": "mortal_\nTYPE: DEATH\nCost: 7 cans. Attack: 8. Defense: 6. Effect: Once per game, summon 2 Death tokens to the battlefield."
   },
   {
     "id": "106",
@@ -787,7 +787,7 @@
   {
     "id": "244",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/244.png",
-    "rawText": "REIGN\n\nwo Wey ee RTE\nEe\nEakin\nod eT\ni: [aa LAER\n\nTYPE: LEGENDARY\nCost: 3 cans. Effect: Retur\nup to 3 Fragments of\nCreation from your discard\npile to your deck and gain\n50 life. Flavor Text: The\nessence of eternity ensureq\ncreation cannot be lost."
+    "rawText": "REIGN\nTYPE: LEGENDARY\nCost: 3 cans. Effect: Return up to 3 Fragments of Creation from your discard pile to your deck and gain 50 life."
   },
   {
     "id": "245",
@@ -1007,7 +1007,7 @@
   {
     "id": "58",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/58.png",
-    "rawText": "The Jungle\nin ei aT RE\no:5 x : Il\nh id vl i\nLi ey\nChE aig) o\nreat\nN -t ! se %\nLa 2)\nTYPE: DEATH\nDeath Tokens\na"
+    "rawText": "The Jungle\nTYPE: DEATH\nCost: 5 cans. Effect: Summon 4 1/1 Death Tokens. Flavor Text: The jungle awakens, and with it, the dead."
   },
   {
     "id": "59",
@@ -1072,7 +1072,7 @@
   {
     "id": "7",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/7.png",
-    "rawText": "Some Asshole\n| Seige FH Fa i ro G\nof; wamm—— a WE\n= yank\nSew x yy Fheoueen\nEla RE\nnn RY § A BRP enue fae\n| epmmeny MRI UB KS el\nBe NE a Be\ngel RA 24) RUE tee a\nianghiltal “rhage IN par | mons\n74 n> abo | ves\nES NW ay he\nTYPE: FLY\nCost: 1 can. Attack: 1. Defense: 2. Effect:\nWhen summoned, reveal the top card from\nyour opponent's deck and destroy that card\nFlavor Text: The messenger of corrupted\nsignals.\nLJ"
+    "rawText": "Some Asshole\n| Seige FH Fa i ro G\nof; wamm—— a WE\n= yank\nSew x yy Fheoueen\nEla RE\nnn RY § A BRP enue fae\n| epmmeny MRI UB KS el\nBe NE a Be\ngel RA 24) RUE tee a\nianghiltal “rhage IN par | mons\n74 n> abo | ves\nTYPE: FLY\nCost: 1 can. Attack: 1. Defense: 2. Effect:\nWhen summoned, reveal the top card from\nyour opponent's deck and destroy that card\nFlavor Text: The messenger of corrupted\nsignals.\nLJ"
   },
   {
     "id": "71",
@@ -1082,7 +1082,7 @@
   {
     "id": "72",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/72.png",
-    "rawText": "FEEL\n=\n9 |\nCost: 9 cans. Attack: 10.\nDefense: 8. Effect: Once per\ngame, destroy 1 Fly card from\nyour opponent's field. Flavor\nText: Riding through the chaos]\nit is the harbinger of death.\nLJ"
+    "rawText": "Crunch\nTYPE: FLY\nCost: 5 cans. Attack: 6. Defense: 4. Effect: This card gains +1 attack for every card in your hand."
   },
   {
     "id": "73",
