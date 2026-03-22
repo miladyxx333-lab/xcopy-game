@@ -248,6 +248,9 @@ const parseCardData = (id) => {
      if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
   }
   
+  if (/move (\d+) card.*from.*hand.*to.*battlefield.*for free/i.test(norm))
+    e.activatedAbility = { cheatIntoPlay: 1, cost: 0 };
+  
   if (/lose (\d+) attack and (\d+) defense for every card.*hand/i.test(norm))
     e.onSummonDebuffOppHandScale = parseInt((norm.match(/lose (\d+)/i) || [0, 1])[1]);
 
@@ -1358,6 +1361,17 @@ function App() {
        setOppHand(h => { let n = [...h]; for(let i=0; i<abil.discard && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
     }
     if (abil.draw) { for(let i=0; i<abil.draw; i++) drawCard(isP); }
+    if (abil.cheatIntoPlay) {
+       const h = isP ? hand : oppHand;
+       if (!h.length) { addLog("! HAND IS EMPTY"); return; }
+       let bestIdx = 0, maxCost = -1;
+       h.forEach((cid, i) => { const c = parseCardData(cid); if (c.cost > maxCost) { maxCost = c.cost; bestIdx = i; } });
+       const targetCid = h[bestIdx];
+       setExecutionStack(prev => [...prev, { owner: (isP ? 'PLAYER' : 'AI'), cardId: targetCid }]);
+       (isP ? setHand : setOppHand)(prev => { const n = [...prev]; n.splice(bestIdx, 1); return n; });
+       addLog(`[ABILITY] ${ci.id}: CHOSE ${targetCid} TO CHEAT INTO PLAY!`);
+       setPlayArea(prev => prev.map(c => c.id === cardInstanceId ? { ...c, usedOnceEffect: true } : c));
+    }
     if (abil.sacrifice && abil.summon) {
        if (area.length < abil.sacrifice + 1) { addLog("! NOT ENOUGH CREATURES TO SACRIFICE"); return; }
        setActiveSacContext({
