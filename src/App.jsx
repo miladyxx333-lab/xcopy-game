@@ -189,7 +189,12 @@ const parseCardData = (id) => {
   }
 
   // ====== COUNTER / INSTANT ======
-  if (/counter.*opponent.*card|negat.*opponent.*card/i.test(eff)) e.onSummonCounter = true;
+  if (/counter (\d+)?.*(doom|death|fly|legendary)/i.test(eff)) {
+    const cm = eff.match(/counter (\d+)/i);
+    e.onSummonCounter = cm ? parseInt(cm[1]) : 1;
+    e.counterType = (eff.match(/(doom|death|fly|legendary)/i) || [''])[0].toLowerCase();
+    if (/legendary/i.test(eff) && /fly/i.test(eff)) e.counterType = 'multi';
+  }
   if (/counter/i.test(eff)) e.isCounter = true;
 
   // ====== IMMUNITY / SHIELD ======
@@ -522,6 +527,28 @@ function App() {
           setEGrave(g => [...g, victim.cardId]);
           addLog(`[STRIKE] ${info.id} DESTROYED THE STRONGEST ENEMY: ${victim.cardId} (ATK:${parseCardData(victim.cardId).attack})`);
           return prev.filter((_, i) => i !== idx);
+       });
+    }
+    if (e.onSummonCounter) {
+       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
+       const setEGrave = isPlayer ? setOppGrave : setGrave;
+       setEnemy(prev => {
+          let rem = e.onSummonCounter;
+          const survivors = [];
+          for (const c of prev) {
+             const pd = parseCardData(c.cardId);
+             const match = (e.counterType === 'multi' && (pd.cardType === 'fly' || pd.cardType === 'legendary' || pd.rawText.toLowerCase().includes('fly') || pd.rawText.toLowerCase().includes('legendary')))
+                        || (pd.cardType === e.counterType || pd.rawText.toLowerCase().includes(e.counterType));
+             
+             if (rem > 0 && match) {
+                setEGrave(g => [...g, c.cardId]);
+                rem--;
+             } else {
+                survivors.push(c);
+             }
+          }
+          if (rem < e.onSummonCounter) addLog(`[COUNTER] ${info.id}: DESTROYED ${e.onSummonCounter - rem} PERMANENTS (${e.counterType.toUpperCase()})`);
+          return survivors;
        });
     }
     if (e.onSummonDestroyRandom) {
