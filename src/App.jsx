@@ -34,6 +34,12 @@ const parseCardData = (id) => {
   const dMatch = txt.match(/defense[: ]*\s*(\d+)/) || txt.match(/def[: ]*\s*(\d+)/);
   if (dMatch) def = parseInt(dMatch[1]);
 
+  let cardType = 'neutral';
+  if (txt.includes('fly')) cardType = 'fly';
+  else if (txt.includes('doom')) cardType = 'doom';
+  else if (txt.includes('death')) cardType = 'death';
+  else if (txt.includes('legendary')) cardType = 'legendary';
+
   const isCreature = (atk > 0 || def > 0) && id !== "0";
   const isSpell = !isCreature && id !== "0";
 
@@ -200,7 +206,7 @@ const parseCardData = (id) => {
   if (isSpell && Object.keys(e).filter(k => k !== 'isInstant').length === 0) e.onSummonDmgPlayer = 2;
   e.isInstant = isSpell;
 
-  return { ...c, cost, attack: atk, defense: def, isCreature, effects: e };
+  return { ...c, cost, attack: atk, defense: def, isCreature, cardType, effects: e };
 };
 
 const INITIAL_HP = 30;
@@ -473,8 +479,9 @@ function App() {
     // Double Attack: all doom cards get 2x attack this turn
     if (e.doubleAttack) {
       (isPlayer ? setPlayArea : setOppPlayArea)(prev => prev.map(c => {
-        if (parseCardData(c.cardId).rawText.toLowerCase().includes('doom'))
-          return { ...c, atkMod: (c.atkMod || 0) + parseCardData(c.cardId).attack };
+        const pd = parseCardData(c.cardId);
+        if (pd.cardType === 'doom' || pd.rawText.toLowerCase().includes('doom'))
+          return { ...c, atkMod: (c.atkMod || 0) + (pd.attack || 0) };
         return c;
       }));
       addLog(`[EFFECT] ${info.id}: DOUBLED ALL DOOM ATK!`);
