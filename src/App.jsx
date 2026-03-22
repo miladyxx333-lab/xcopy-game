@@ -249,6 +249,9 @@ const parseCardData = (id) => {
      if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
   }
   
+  if (/all cards take (\d+) damage.*end of each turn/i.test(norm))
+    e.onEndTurnDmgAllUnits = parseInt((norm.match(/(\d+)/i) || [0, 1])[1]);
+
   if (/move (\d+) card.*from.*hand.*to.*battlefield.*for free/i.test(norm))
     e.activatedAbility = { cheatIntoPlay: 1, cost: 0 };
   
@@ -1186,6 +1189,21 @@ function App() {
         setHp(h => Math.max(0, h - eDmg));
         setOppHp(h => Math.max(0, h - eDmg));
         addLog(`[DOOM] THE END OF THE TURN: ALL PLAYERS -${eDmg} HP`);
+      }
+
+      // Global End-Turn Check (Units)
+      let uDmg = 0;
+      allC.forEach(c => { const d = parseCardData(c.cardId).effects; if (d.onEndTurnDmgAllUnits) uDmg += d.onEndTurnDmgAllUnits; });
+      if (uDmg > 0) {
+        const handleDmg = (prev, setG, isP) => prev.map(c => {
+          const pd = parseCardData(c.cardId);
+          const curD = pd.defense + (c.defMod || 0);
+          if (curD <= uDmg) { setG(g => [...g, c.cardId]); runOnDeath(c.cardId, isP); return null; }
+          return { ...c, defMod: (c.defMod || 0) - uDmg };
+        }).filter(Boolean);
+        setPlayArea(p => handleDmg(p, setGrave, true));
+        setOppPlayArea(p => handleDmg(p, setOppGrave, false));
+        addLog(`[DOOM] WORMHOLE STRIKE: ALL UNITS -${uDmg} DEF`);
       }
 
       // Turn Start Passives (Heal etc)
