@@ -157,6 +157,7 @@ const parseCardData = (id) => {
     if (tm) e.onAttackSummonToken = { atk: +tm[1], def: +tm[2] };
   }
   if (/attack.*remove.*(card|random).*deck/i.test(eff)) e.onAttackMillOpp = 1;
+  if (/all players get (\d+) damage.*end.*turn/i.test(eff)) e.onEndTurnDmgBoth = parseInt((eff.match(/(\d+) damage/i) || [0, 3])[1]);
   if (/freeze/i.test(eff) && /attack/i.test(eff)) e.onAttackFreeze = true;
   if (/gain.*\+(\d+) attack/i.test(eff) && /attack/i.test(eff) && !/summon/i.test(eff))
     e.onAttackSelfBuff = parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]);
@@ -1087,6 +1088,17 @@ function App() {
       setPLockSummon(prev => Math.max(0, prev - 1));
       setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
       setOppPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
+      
+      // Global End-Turn Check 
+      const allC = [...playArea, ...oppPlayArea];
+      let eDmg = 0;
+      allC.forEach(c => { const d = parseCardData(c.cardId).effects; if (d.onEndTurnDmgBoth) eDmg += d.onEndTurnDmgBoth; });
+      if (eDmg > 0) {
+        setHp(h => Math.max(0, h - eDmg));
+        setOppHp(h => Math.max(0, h - eDmg));
+        addLog(`[DOOM] THE END OF THE TURN: ALL PLAYERS -${eDmg} HP`);
+      }
+
       if (!skipDrawP) drawCard(true);
       else { addLog("! DRAW PHASE SKIPPED"); setSkipDrawP(false); }
       addLog(">> YOUR TURN. READY.");
