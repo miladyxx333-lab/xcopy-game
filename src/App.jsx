@@ -56,6 +56,11 @@ const parseCardData = (id) => {
   const drawM = eff.match(/draw (\d+) card/i);
   if (drawM && !/attack.*draw/i.test(eff) && !/opponent.*draw/i.test(eff))
     e.onSummonDraw = parseInt(drawM[1]);
+  if (/draw a card/i.test(eff) && !/attack/i.test(eff)) e.onSummonDraw = 1;
+
+  if (/draw.*both/i.test(eff)) e.onSummonDrawBoth = parseInt((eff.match(/draw (\d+)/i) || [0, 1])[1]);
+  
+  if (/lose.*draw phase/i.test(eff)) e.onSummonSkipDrawNext = true;
 
   if (/gain (\d+) extra life|gain (\d+).*life|heal.*?(\d+)/i.test(eff)) {
     const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*health/i) || eff.match(/(\d+).*life/i);
@@ -139,8 +144,10 @@ const parseCardData = (id) => {
   // ====== ON ATTACK ======
   if (/attack.*discard|when this card attacks.*discard/i.test(eff))
     e.onAttackDiscardOpp = true;
-  if (/attack.*draw (\d+)/i.test(eff))
-    e.onAttackDraw = parseInt((eff.match(/draw (\d+)/i) || [0, 1])[1]);
+  if (/attack.*draw|after summoning.*draw|discard.*then.*draw/i.test(eff)) {
+    const dm = eff.match(/draw (\d+)/i) || ( /draw a card|then you draw/i.test(eff) ? [0, 1] : null );
+    if (dm) e.onAttackDraw = parseInt(dm[1]);
+  }
   if (/attack.*deal (\d+) damage.*all/i.test(eff))
     e.onAttackDmgAllEnemy = parseInt((eff.match(/deal (\d+)/i) || [0, 1])[1]);
   else if (/attack.*deal (\d+) damage/i.test(eff))
@@ -306,7 +313,9 @@ function App() {
   const [executionStack, setExecutionStack] = useState([]);
   const [pLockSummon, setPLockSummon] = useState(0);
   const [oLockSummon, setOLockSummon] = useState(0);
-  const [log, setLog] = useState(["XCOPY_ARENA_OS_v12.0 // SYSTEM_READY.", "THE USELESS LOCKDOWN HAS BEEN ARMED."]);
+  const [skipDrawP, setSkipDrawP] = useState(false);
+  const [skipDrawO, setSkipDrawO] = useState(false);
+  const [log, setLog] = useState(["XCOPY_ARENA_OS_v13.2 // SYSTEM_READY.", "DRAW LOGIC AUDITED & OPTIMIZED."]);
 
   useEffect(() => {
     if (!gameStarted) return;
@@ -403,6 +412,15 @@ function App() {
     if (e.onSummonDraw) {
       for (let i = 0; i < e.onSummonDraw; i++) drawCard(isPlayer);
       addLog(`[EFFECT] ${info.id}: DREW ${e.onSummonDraw} CARD(S)`);
+    }
+    if (e.onSummonDrawBoth) {
+      for (let i = 0; i < e.onSummonDrawBoth; i++) { drawCard(true); drawCard(false); }
+      addLog(`[EFFECT] ${info.id}: BOTH PLAYERS DREW ${e.onSummonDrawBoth}`);
+    }
+    if (e.onSummonSkipDrawNext) {
+       if (isPlayer) setSkipDrawO(true);
+       else setSkipDrawP(true);
+       addLog(`[DEBUFF] ${info.id}: TARGET SKIPS NEXT DRAW PHASE!`);
     }
     if (e.onSummonHeal) {
       (isPlayer ? setHp : setOppHp)(h => h + e.onSummonHeal);
@@ -1054,10 +1072,11 @@ function App() {
   useEffect(() => {
     if (!gsRef.current || winRef.current !== null) return;
     if (turn === 'PLAYER' && phase === 'MAIN') {
-      setSoup(s => ({ ...s, current: s.max }));
-      setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false })));
+      setPLockSummon(prev => Math.max(0, prev - 1));
+      setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
       setOppPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
-      drawCard(true);
+      if (!skipDrawP) drawCard(true);
+      else { addLog("! DRAW PHASE SKIPPED"); setSkipDrawP(false); }
       addLog(">> YOUR TURN. READY.");
     }
   }, [turn, addLog, drawCard]);
@@ -1070,10 +1089,12 @@ function App() {
       await new Promise(r => setTimeout(r, 500));
       if (!live || winRef.current !== null) return;
 
+      setOLockSummon(prev => Math.max(0, prev - 1));
       // Reset AI creatures
-      setOppPlayArea(prev => prev.map(o => ({ ...o, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false })));
+      setOppPlayArea(prev => prev.map(o => ({ ...o, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
       setPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
-      drawCard(false);
+      if (!skipDrawO) drawCard(false);
+      else { addLog("! AI SKIPS DRAW PHASE"); setSkipDrawO(false); }
 
       await new Promise(r => setTimeout(r, 700));
       if (!live || winRef.current !== null) return;
