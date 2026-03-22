@@ -62,11 +62,13 @@ const parseCardData = (id) => {
     if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2] || healM[3]);
   }
 
-  if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff)) {
+  if (/discard/i.test(eff)) {
     const discardM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*discard/i);
     const amt = discardM ? parseInt(discardM[1]) : 1;
-    if (/once per turn/i.test(eff)) e.onAttackDiscardOpp = amt;
-    else e.onSummonDiscardOpp = amt;
+    if (/both/i.test(eff)) { e.onSummonDiscardBoth = amt; }
+    else if (/your hand|from you/i.test(eff) && !/opponent/i.test(eff)) { e.onSummonDiscardSelf = amt; }
+    else if (/once per turn/i.test(eff)) { e.onAttackDiscardOpp = amt; }
+    else { e.onSummonDiscardOpp = amt; }
   }
 
   // Damage: all enemy > all cards > player HP > single target
@@ -220,7 +222,8 @@ const parseCardData = (id) => {
      }
      if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
      if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
-     if (/discard/i.test(eff)) e.activatedAbility.discard = 2;
+     if (/discard/i.test(eff)) e.activatedAbility.discard = parseInt((eff.match(/discard.*?(\d+)/i) || [0, 2])[1]);
+     if (/draw/i.test(eff)) e.activatedAbility.draw = parseInt((eff.match(/draw.*?(\d+)/i) || [0, 1])[1]);
   }
 
   // ====== LIMITERS ======
@@ -435,6 +438,14 @@ function App() {
         return n; 
       });
       addLog(`[EFFECT] ${info.id}: FORCED DISCARD COMPLETED`);
+    }
+    if (e.onSummonDiscardSelf) {
+       setHand(h => { let n = [...h]; for(let i=0; i<e.onSummonDiscardSelf && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
+    }
+    if (e.onSummonDiscardBoth) {
+       const amt = e.onSummonDiscardBoth;
+       setHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
+       setOppHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
     }
     if (e.onSummonWheel) {
       const setOppH = isPlayer ? setOppHand : setHand;
@@ -1166,6 +1177,11 @@ function App() {
           return n;
        });
     }
+    if (abil.discard) {
+       setHand(h => { let n = [...h]; for(let i=0; i<abil.discard && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+       setOppHand(h => { let n = [...h]; for(let i=0; i<abil.discard && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+    }
+    if (abil.draw) { for(let i=0; i<abil.draw; i++) drawCard(isP); }
     if (abil.sacrifice && abil.summon) {
        const setArea = isP ? setPlayArea : setOppPlayArea;
        const setG = isP ? setGrave : setOppGrave;
