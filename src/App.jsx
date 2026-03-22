@@ -279,9 +279,8 @@ const parseCardData = (id) => {
   if (/double.*attack/i.test(eff))
     e.doubleAttack = true;
 
-  // ====== CORRUPT / DESTROY SOUP ======
-  if (/corrupt.*soup|destroy.*can|destroy.*enemy.*can/i.test(eff))
-    e.corruptSoup = true;
+  if (/reduce.*attack.*all enemy.*by (\d+)/i.test(eff)) e.onSummonReduceAtkAll = parseInt((eff.match(/by (\d+)/i) || [0, 10])[1]);
+  if (/heal.*player.*(\d+).*start of each turn/i.test(eff)) e.onTurnStartHealSelf = parseInt((eff.match(/(\d+) health/i) || [0, 3])[1]);
 
   // Default spell damage
   if (isSpell && Object.keys(e).filter(k => k !== 'isInstant').length === 0) e.onSummonDmgPlayer = 2;
@@ -506,6 +505,11 @@ function App() {
        if (isPlayer) setOLockSummon(e.onSummonLock);
        else setPLockSummon(e.onSummonLock);
        addLog(`[STASIS] ${info.id}: SUMMON LOOCK PROTOCOLS DISABLED FOR 1 TURN!`);
+    }
+    if (e.onSummonReduceAtkAll) {
+       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
+       setEnemy(prev => prev.map(c => ({ ...c, atkMod: (c.atkMod || 0) - e.onSummonReduceAtkAll })));
+       addLog(`[STRIKE] ${info.id}: REDUCED ALL ENEMY ATK BY ${e.onSummonReduceAtkAll}`);
     }
     if (e.onSummonDestroyStrongest) {
        const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
@@ -1091,7 +1095,7 @@ function App() {
       setPlayArea(prev => prev.map(c => ({ ...c, canAttack: true, isAttacking: false, blockedBy: null, usedTurnEffect: false, frozen: false })));
       setOppPlayArea(prev => prev.map(c => ({ ...c, usedTurnEffect: false })));
       
-      // Global End-Turn Check 
+      // Global End-Turn Check
       const allC = [...playArea, ...oppPlayArea];
       let eDmg = 0;
       allC.forEach(c => { const d = parseCardData(c.cardId).effects; if (d.onEndTurnDmgBoth) eDmg += d.onEndTurnDmgBoth; });
@@ -1099,6 +1103,14 @@ function App() {
         setHp(h => Math.max(0, h - eDmg));
         setOppHp(h => Math.max(0, h - eDmg));
         addLog(`[DOOM] THE END OF THE TURN: ALL PLAYERS -${eDmg} HP`);
+      }
+
+      // Turn Start Passives (Heal etc)
+      let healAmt = 0;
+      playArea.forEach(c => { const d = parseCardData(c.cardId).effects; if (d.onTurnStartHealSelf) healAmt += d.onTurnStartHealSelf; });
+      if (healAmt > 0) {
+        setHp(h => h + healAmt);
+        addLog(`[REGEN] ${healAmt} HP RECOVERED FROM PASSIVES`);
       }
 
       if (!skipDrawP) drawCard(true);
