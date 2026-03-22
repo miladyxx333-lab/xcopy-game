@@ -248,9 +248,10 @@ const parseCardData = (id) => {
      if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
   }
   
-  if (/no cards can be summoned/i.test(eff)) e.onSummonLock = 1;
-  
-  if (/no cards can be summoned/i.test(eff)) e.onSummonLock = 1;
+  if (/lose (\d+) attack and (\d+) defense for every card.*hand/i.test(norm))
+    e.onSummonDebuffOppHandScale = parseInt((norm.match(/lose (\d+)/i) || [0, 1])[1]);
+
+  if (/no cards can be summoned/i.test(norm)) e.onSummonLock = 1;
 
   // ====== LIMITERS ======
   if (/once per game/i.test(eff)) e.oncePerGame = true;
@@ -534,6 +535,22 @@ function App() {
        if (isPlayer) setOLockSummon(e.onSummonLock);
        else setPLockSummon(e.onSummonLock);
        addLog(`[STASIS] ${info.id}: SUMMON LOOCK PROTOCOLS DISABLED FOR 1 TURN!`);
+    }
+    if (e.onSummonDebuffOppHandScale) {
+       const scale = (isPlayer ? oppHand : hand).length;
+       const amt = e.onSummonDebuffOppHandScale * scale;
+       const setEnemyArea = isPlayer ? setOppPlayArea : setPlayArea;
+       const setEnemyGrave = isPlayer ? setOppGrave : setGrave;
+       setEnemyArea(prev => {
+          return prev.map(c => {
+             const pd = parseCardData(c.cardId);
+             const currentDef = pd.defense + (c.defMod || 0);
+             const newDef = currentDef - amt;
+             if (newDef <= 0) { setEnemyGrave(g => [...g, c.cardId]); return null; }
+             return { ...c, atkMod: (c.atkMod || 0) - amt, defMod: (c.defMod || 0) - amt };
+          }).filter(c => c !== null);
+       });
+       addLog(`[CURSE] ${info.id}: ENEMY FIELD -${amt}/-${amt} (HAND SIZE: ${scale})`);
     }
     if (e.onSummonReduceAtkAll) {
        const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
