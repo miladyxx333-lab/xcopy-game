@@ -57,60 +57,61 @@ const parseCardData = (id) => {
   const drawM = norm.match(/draw (\d+) card/i) || norm.match(/draw one card/i);
   if (drawM && !/attack.*draw/i.test(norm) && !/opponent.*draw/i.test(norm)) {
      if (drawM[1]) e.onSummonDraw = parseInt(drawM[1]);
-     else e.onSummonDraw = 1;
+    else e.onSummonDraw = 1;
   }
 
   if (/draw.*both/i.test(norm)) e.onSummonDrawBoth = parseInt((norm.match(/draw (\d+)/i) || [0, 1])[1]);
   if (/lose.*draw phase/i.test(norm)) e.onSummonSkipDrawNext = true;
 
-  if (/(heal|gain).*?(\d+).*?(health|life|hp)/i.test(eff) || /heal.*?by (\d+)/i.test(eff) || /gain (\d+).*?life/i.test(eff)) {
-    const healM = eff.match(/(\d+)/);
+  if (/(heal|gain).*?(\d+).*?(health|life|hp)/i.test(norm) || /heal.*?by (\d+)/i.test(norm) || /gain (\d+).*?life/i.test(norm)) {
+    const healM = norm.match(/(\d+)/);
     if (healM) e.onSummonHeal = parseInt(healM[1]);
   }
 
-  if (/discard/i.test(eff)) {
-    const discardM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*discard/i);
+  if (/discard/i.test(norm)) {
+    const discardM = norm.match(/discard.*?(\d+)/i) || norm.match(/(\d+).*discard/i);
     const amt = discardM ? parseInt(discardM[1]) : 1;
-    if (/both/i.test(eff)) { e.onSummonDiscardBoth = amt; }
-    else if (/your hand|from you/i.test(eff) && !/opponent/i.test(eff)) { e.onSummonDiscardSelf = amt; }
-    else if (/once per turn/i.test(eff)) { e.onAttackDiscardOpp = amt; }
+    if (/both/i.test(norm)) { e.onSummonDiscardBoth = amt; }
+    else if (/your hand|from you/i.test(norm) && !/opponent/i.test(norm)) { e.onSummonDiscardSelf = amt; }
+    else if (/once per turn/i.test(norm)) { e.onAttackDiscardOpp = amt; }
     else { e.onSummonDiscardOpp = amt; }
   }
 
-  if (/freeze.*one.*enemy/i.test(eff)) e.onAttackFreezeEnemy = true;
+  if (/freeze.*one.*enemy/i.test(norm)) e.onAttackFreezeEnemy = true;
 
   // Damage: all enemy > all cards > player HP > single target
-  if (/deal (\d+) damage to all.*enem|deal (\d+) damage to all.*opponent/i.test(eff))
-    e.onSummonDmgAllEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-  else if (/deal (\d+) damage to all card/i.test(eff))
-    e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-  else if (/(\d+) damage to.*(opponent|enemy|player).*(life|health|hp)/i.test(eff) || /(\d+) damage to the opponent/i.test(eff))
-    e.onSummonDmgPlayer = parseInt((eff.match(/(\d+)/) || [0, 5])[1]);
-  if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/end of/i.test(eff)) {
-    const amt = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
-    if (/once per turn/i.test(eff)) {
+  if (/deal (\d+) damage to all.*enem|deal (\d+) damage to all.*opponent/i.test(norm))
+    e.onSummonDmgAllEnemy = parseInt((norm.match(/deal (\d+) damage/i) || [0, 2])[1]);
+  else if (/deal (\d+) damage to all card/i.test(norm))
+    e.onSummonDmgAll = parseInt((norm.match(/deal (\d+) damage/i) || [0, 2])[1]);
+  else if (/(\d+) damage to.*(opponent|enemy|player).*(life|health|hp)/i.test(norm) || /(\d+) damage to the opponent/i.test(norm))
+    e.onSummonDmgPlayer = parseInt((norm.match(/(\d+)/) || [0, 5])[1]);
+  if (/deal (\d+) damage/i.test(norm) && !/destroyed/i.test(norm) && !/end of/i.test(norm)) {
+    const amt = parseInt((norm.match(/deal (\d+) damage/i) || [0, 2])[1]);
+    if (/once per turn/i.test(norm)) {
       e.onAttackDmgTarget = amt;
       e.oncePerTurn = true;
-      if (/of your choice/i.test(eff)) e.targetChoice = true;
-    } else if (!/attack/i.test(eff)) {
+      if (/of your choice/i.test(norm)) e.targetChoice = true;
+    } else if (!/attack/i.test(norm)) {
       e.onSummonDmgTargetEnemy = amt;
     }
-    if (/of your choice/i.test(eff) && !e.onAttackDmgTarget) e.targetChoice = true;
+    if (/of your choice/i.test(norm) && !e.onAttackDmgTarget) e.targetChoice = true;
   }
 
   // Destroy cards
-  if (/destroy all.*fly/i.test(eff)) e.onSummonDestroyTypeFly = true;
-  else if (/destroy (one|1|a).*fly/i.test(eff)) e.onSummonDestroyOneFly = true;
+  if (/destroy.*all.*fly|destroys.*all.*fly/i.test(norm)) e.onSummonDestroyTypeFly = true;
+  else if (/destroy.*fly|destroys.*fly/i.test(norm)) e.onSummonDestroyOneFly = true;
 
-  if (/destroy all.*death/i.test(eff)) e.onSummonDestroyTypeDeath = true;
-  else if (/destroy (one|1|a).*death/i.test(eff)) e.onSummonDestroyOneDeath = true;
+  if (/destroy.*all.*death|destroys.*all.*death/i.test(norm)) e.onSummonDestroyTypeDeath = true;
+  else if (/destroy.*death|destroys.*death/i.test(norm)) e.onSummonDestroyOneDeath = true;
 
-  if (/destroy all.*doom|doom.*destroy/i.test(eff)) e.onSummonDestroyTypeDoom = true;
-  else if (/destroy (one|1|a).*doom/i.test(eff)) e.onSummonDestroyOneDoom = true;
-  if (/destroy all.*cost.*less than (\d+)|destroy all.*cost.*(\d+) or less/i.test(eff))
-    e.onSummonDestroyByCost = parseInt((eff.match(/less than (\d+)|(\d+) or less/i) || [0, 5])[1] || 5);
-  if (/(\d+) or less (attack|defense)|less than (\d+) attack/i.test(eff))
-    e.onSummonDestroyByDef = parseInt((eff.match(/(\d+) or less/i) || eff.match(/less than (\d+)/i) || [0, 3])[1]);
+  if (/destroy.*all.*doom|destroys.*all.*doom/i.test(norm)) e.onSummonDestroyTypeDoom = true;
+  else if (/destroy.*doom|destroys.*doom/i.test(norm)) e.onSummonDestroyOneDoom = true;
+
+  if (/destroy.*all.*cost.*less than (\d+)|destroy.*all.*cost.*(\d+) or less/i.test(norm))
+    e.onSummonDestroyByCost = parseInt((norm.match(/less than (\d+)/i) || norm.match(/(\d+) or less/i) || [0, 5])[1] || 5);
+  if (/(\d+) or less (attack|defense)|less than (\d+) (attack|defense)/i.test(norm))
+    e.onSummonDestroyByDef = parseInt((norm.match(/(\d+) or less/i) || norm.match(/less than (\d+)/i) || [0, 3])[1]);
   if (/destroy.*strongest|destroy.*highest/i.test(eff))
     e.onSummonDestroyStrongest = true;
   if (/destroy (\d+).*random.*(enemy|opponent)/i.test(eff) && !e.onSummonDestroyTypeFly && !e.onSummonDestroyTypeDeath && !e.onSummonDestroyByCost && !e.onSummonDestroyStrongest)
