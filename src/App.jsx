@@ -1489,10 +1489,14 @@ function App() {
           }
           if (isOpp) {
              if (phase === 'DECLARE_BLOCKS') assignBlocker(i);
-          } else if (turn === 'PLAYER') {
-             if (phase === 'MAIN' && ci.effects.activatedAbility) useAbility(obj.id, true);
-             else if (phase === 'DECLARE_ATTACKS' && !isSoup) toggleAttack(i);
-             else if (phase === 'DECLARE_BLOCKS') selectBlocker(i);
+          } else {
+             if (turn === 'PLAYER') {
+                if (phase === 'MAIN' && ci.effects.activatedAbility) useAbility(obj.id, true);
+                else if (phase === 'DECLARE_ATTACKS' && !isSoup) toggleAttack(i);
+                else if (phase === 'DECLARE_BLOCKS') selectBlocker(i);
+             } else if (turn === 'AI' && phase === 'DECLARE_BLOCKS') {
+                selectBlocker(i);
+             }
           }
         }}
         {...bH(obj.cardId)}
