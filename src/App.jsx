@@ -62,9 +62,9 @@ const parseCardData = (id) => {
   
   if (/lose.*draw phase/i.test(eff)) e.onSummonSkipDrawNext = true;
 
-  if (/gain (\d+) extra life|gain (\d+).*life|heal.*?(\d+)/i.test(eff)) {
-    const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*health/i) || eff.match(/(\d+).*life/i);
-    if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2] || healM[3]);
+  if (/(heal|gain).*?(\d+).*?(health|life|hp)/i.test(eff) || /heal.*?by (\d+)/i.test(eff) || /gain (\d+).*?life/i.test(eff)) {
+    const healM = eff.match(/(\d+)/);
+    if (healM) e.onSummonHeal = parseInt(healM[1]);
   }
 
   if (/discard/i.test(eff)) {
