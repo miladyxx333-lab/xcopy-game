@@ -85,7 +85,10 @@ const parseCardData = (id) => {
     e.onSummonReduceAtk = parseInt((eff.match(/(\d+)/i) || [0, 1])[1]);
 
   // Summon tokens on entry
-  if (/summon.*?(\d+)\/(\d+)/i.test(eff) && !/attack/i.test(eff) && !/destroyed/i.test(eff)) {
+  if (/summon.*?(\d+).*?(\d+)\/(\d+)/i.test(eff) && !/attack/i.test(eff) && !/destroyed/i.test(eff)) {
+    const tm = eff.match(/summon.*?(\d+).*?(\d+)\/(\d+)/i);
+    if (tm) e.onSummonToken = { count: +tm[1], atk: +tm[2], def: +tm[3] };
+  } else if (/summon.*?(\d+)\/(\d+)/i.test(eff) && !/attack|destroyed/i.test(eff)) {
     const tm = eff.match(/summon.*?(\d+)\/(\d+)/i);
     if (tm) e.onSummonToken = { atk: +tm[1], def: +tm[2], count: parseInt((eff.match(/summon (\d+) /i) || [0, 1])[1]) };
   }
@@ -136,9 +139,11 @@ const parseCardData = (id) => {
   else if (/all.*death.*gain \+(\d+)/i.test(eff))
     e.auraBuff = { type: 'death', amount: parseInt((eff.match(/\+(\d+)/i) || [0, 1])[1]) };
 
-  // Self-buff per card type on field
-  if (/this card.*gain.*\+(\d+).*for (each|every)/i.test(eff) || /gain \+(\d+) attack for (each|every)/i.test(eff))
+  // Self-buff per card type on field or hand
+  if (/this card.*gain.*\+(\d+).*for (each|every)/i.test(eff) || /gain \+(\d+) attack for (each|every)/i.test(eff)) {
     e.selfBuffPerType = true;
+    if (/hand/i.test(eff)) e.selfBuffSource = 'hand';
+  }
 
   // ====== COUNTER / INSTANT ======
   if (/counter/i.test(eff)) e.isCounter = true;
@@ -156,9 +161,15 @@ const parseCardData = (id) => {
   if (/discard your opponent's entire hand/i.test(eff))
     e.onSummonWheel = true;
 
-  // ====== SEARCH DECK ======
-  if (/search.*deck/i.test(eff))
-    e.onSummonSearch = true;
+  // ====== SEARCH DECK / LIBRARY ======
+  if (/search.*(deck|library|biblioteca|mazo)|look at.*(deck|library|biblioteca|mazo)|find a card/i.test(eff)) {
+    if (/destroyed|death/i.test(eff)) {
+      if (/summon/i.test(eff)) e.onDeathSummonFromDeck = true;
+      else e.onDeathSearch = true;
+    } else {
+      e.onSummonSearch = true;
+    }
+  }
 
   // ====== GRAVEYARD RETURN ======
   if (/return all destroyed cards to owners' hands/i.test(eff))
@@ -229,6 +240,10 @@ function App() {
   useEffect(() => { winRef.current = winner; }, [winner]);
   const oppSoupRef = useRef(oppSoup);
   useEffect(() => { oppSoupRef.current = oppSoup; }, [oppSoup]);
+  const handRef = useRef(hand);
+  useEffect(() => { handRef.current = hand; }, [hand]);
+  const oppHandRef = useRef(oppHand);
+  useEffect(() => { oppHandRef.current = oppHand; }, [oppHand]);
 
   const addLog = useCallback((msg) => {
     setLog(prev => [...prev.slice(-6), msg]);
@@ -417,30 +432,39 @@ function App() {
       setOppGrave([]);
       addLog(`[EFFECT] ${info.id}: ALL GRAVEYARDS RETURNED TO HANDS`);
     }
-    // Search Deck (randomized for simplicity)
+    // Search Deck / Library (randomized for simplicity)
     if (e.onSummonSearch) {
       const setD = isPlayer ? setDeck : setOppDeck;
       const setH = isPlayer ? setHand : setOppHand;
       setD(prev => {
-        if (!prev.length) return prev;
+        if (!prev.length) { addLog("! LIBRARY EMPTY"); return prev; }
         const d = [...prev];
         const idx = Math.floor(Math.random() * d.length);
         const cardFound = d.splice(idx, 1)[0];
         setH(h => [...h, cardFound]);
         return d;
       });
-      addLog(`[EFFECT] ${info.id}: SEARCHED DECK & DREW 1 CARD`);
+      addLog(`[EFFECT] ${info.id}: SEARCHED LIBRARY & DREW 1 CARD`);
     }
-    // Self-buff per type on field (V7 Dynamic)
+    // Self-buff per type on field or hand (V7.1 Dynamic)
     if (e.selfBuffPerType) {
-      const type = /fly/i.test(info.id) || /fly/i.test(info.rawText) ? 'fly' : /doom/i.test(info.id) || /doom/i.test(info.rawText) ? 'doom' : 'death';
-      const myArea = isPlayer ? pRef.current : oRef.current;
-      const count = myArea.filter(c => parseCardData(c.cardId).rawText.toLowerCase().includes(type) || c.cardId === info.id).length;
+      let count = 0;
+      let label = "";
+      if (e.selfBuffSource === 'hand') {
+        count = isPlayer ? handRef.current.length : oppHandRef.current.length;
+        label = "CARDS IN HAND";
+      } else {
+        const type = /fly/i.test(info.id) || /fly/i.test(info.rawText) ? 'fly' : /doom/i.test(info.id) || /doom/i.test(info.rawText) ? 'doom' : 'death';
+        const myArea = isPlayer ? pRef.current : oRef.current;
+        count = myArea.filter(c => parseCardData(c.cardId).rawText.toLowerCase().includes(type) || c.cardId === info.id).length;
+        label = `${type.toUpperCase()} COUNT`;
+      }
+      
       if (count > 0) {
         (isPlayer ? setPlayArea : setOppPlayArea)(prev => prev.map(c => 
           (c.id === cardInstanceId) ? { ...c, atkMod: (c.atkMod || 0) + count } : c
         ));
-        addLog(`[EFFECT] ${info.id}: SELF-BUFF +${count} ATK (${type.toUpperCase()} COUNT)`);
+        addLog(`[EFFECT] ${info.id}: SELF-BUFF +${count} ATK (${label})`);
       }
     }
     // Double Attack: all doom cards get 2x attack this turn
@@ -493,9 +517,30 @@ function App() {
     }
     if (e.onDeathSummonToken) {
       const tkId = `TOKEN_${e.onDeathSummonToken.atk}_${e.onDeathSummonToken.def}`;
-      const token = { id: Math.random().toString(), cardId: tkId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0 };
+      const token = { id: Math.random().toString(), cardId: tkId, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, usedOnceEffect: false, usedTurnEffect: false };
       (isPlayer ? setPlayArea : setOppPlayArea)(prev => [...prev, token]);
       addLog(`[DEATH] ${cardId}: SPAWNED ${e.onDeathSummonToken.atk}/${e.onDeathSummonToken.def} TOKEN`);
+    }
+    // Death Search / Summon from deck
+    if (e.onDeathSearch || e.onDeathSummonFromDeck) {
+      const setD = isPlayer ? setDeck : setOppDeck;
+      const setArea = isPlayer ? setPlayArea : setOppPlayArea;
+      const setH = isPlayer ? setHand : setOppHand;
+      setD(prev => {
+        if (!prev.length) return prev;
+        const d = [...prev];
+        const idx = Math.floor(Math.random() * d.length);
+        const cid = d.splice(idx, 1)[0];
+        if (e.onDeathSummonFromDeck) {
+          const obj = { id: Math.random().toString(), cardId: cid, canAttack: false, isAttacking: false, blockedBy: null, atkMod: 0, usedOnceEffect: false, usedTurnEffect: false };
+          setArea(p => [...p, obj]);
+          addLog(`[DEATH] ${cardId}: SUMMONED ${cid} FROM LIBRARY`);
+        } else {
+          setH(h => [...h, cid]);
+          addLog(`[DEATH] ${cardId}: SEARCHED LIBRARY FOR ${cid}`);
+        }
+        return d;
+      });
     }
   }, [addLog]);
 
@@ -780,9 +825,6 @@ function App() {
       addLog(">> YOUR TURN. READY.");
     }
   }, [turn, addLog, drawCard]);
-  const oppHandRef = useRef(oppHand);
-  useEffect(() => { oppHandRef.current = oppHand; }, [oppHand]);
-
   // ---- AI TURN ----
   useEffect(() => {
     if (turn !== 'AI' || winRef.current !== null || phase !== 'MAIN') return;
