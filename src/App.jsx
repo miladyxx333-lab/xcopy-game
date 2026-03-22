@@ -204,6 +204,9 @@ const parseCardData = (id) => {
 
   // ====== WIN CONDITION (FRAGMENTS) ======
   // ====== PASSIVE TRIGGERS (V9) ======
+  if (/if a FLY card is summoned/i.test(eff))
+    e.onSummonFlyDmgAll = parseInt((eff.match(/lose (\d+) Life/i) || [0, 3])[1]);
+
   if (/whenever.*destroyed/i.test(eff) || /when.*destroyed/i.test(eff)) {
     if (/gain (\d+) soup/i.test(eff) || /gain (\d+) can/i.test(eff)) {
       e.passiveOnDeathGainSoup = parseInt((eff.match(/gain (\d+)/i) || [0, 1])[1]);
@@ -934,6 +937,17 @@ function App() {
         if (item.owner === 'PLAYER') {
           addP.push(obj);
           addLog(`> SUMMONED: ${card.id}`);
+          
+          // Global Summon Reactions
+          const isFly = card.cardType === 'fly' || card.rawText.toLowerCase().includes('fly');
+          [...playArea, ...oppPlayArea].forEach(ex => {
+             const epd = parseCardData(ex.cardId).effects;
+             if (epd.onSummonFlyDmgAll && isFly) {
+                setHp(h => Math.max(0, h - epd.onSummonFlyDmgAll));
+                setOppHp(h => Math.max(0, h - epd.onSummonFlyDmgAll));
+                addLog(`[PASSIVE] ${ex.cardId} REACTED: FLY SUMMONED! EVERYONE -${epd.onSummonFlyDmgAll} HP`);
+             }
+          });
           if (card.effects.requiresSacrifice) {
             let rem = card.effects.requiresSacrifice, type = card.effects.sacrificeType;
             setPlayArea(prev => {
