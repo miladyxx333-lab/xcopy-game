@@ -313,12 +313,19 @@ function App() {
 
   // ---- DRAW ----
   const drawCard = useCallback((isPlayer) => {
+    if (winner) return;
     if (isPlayer) {
-      setDeck(prev => { if (!prev.length) return prev; const d = [...prev]; setHand(h => [...h, d.shift()]); return d; });
+      setDeck(prev => { 
+        if (!prev.length) { setWinner('AI OVERLORD (MILL)'); return prev; } 
+        const d = [...prev]; setHand(h => [...h, d.shift()]); return d; 
+      });
     } else {
-      setOppDeck(prev => { if (!prev.length) return prev; const d = [...prev]; setOppHand(h => [...h, d.shift()]); return d; });
+      setOppDeck(prev => { 
+        if (!prev.length) { setWinner('PLAYER ONE (MILL)'); return prev; } 
+        const d = [...prev]; setOppHand(h => [...h, d.shift()]); return d; 
+      });
     }
-  }, []);
+  }, [winner]);
 
   // ---- EFFECT HOOKS (V7 - WITH ONCE-PER-GAME ENFORCEMENT) ----
   const runOnSummon = useCallback((info, isPlayer, cardInstanceId) => {
@@ -1052,10 +1059,11 @@ function App() {
 
   // ---- WIN CHECK ----
   useEffect(() => {
-    if (winRef.current !== null || !gsRef.current) return;
-    if (hp <= 0) setWinner('AI OVERLORD');
-    if (oppHp <= 0) setWinner('PLAYER ONE');
-  }, [hp, oppHp]);
+    if (winner || !gameStarted) return;
+    if (hp <= 0 && oppHp <= 0) setWinner('NEUTRALIZED (DRAW)');
+    else if (hp <= 0) setWinner('AI OVERLORD');
+    else if (oppHp <= 0) setWinner('PLAYER ONE');
+  }, [hp, oppHp, winner, gameStarted]);
 
   // ---- GAME OVER ----
   if (winner) {
