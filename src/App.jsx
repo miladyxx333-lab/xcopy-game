@@ -40,7 +40,7 @@ const parseCardData = (id) => {
   else if (txt.includes('death')) cardType = 'death';
   else if (txt.includes('legendary')) cardType = 'legendary';
 
-  const isFragment = txt.includes('fragment') || txt.includes('creation');
+  const isFragment = txt.includes('fragment of creation -') || txt.includes('soul fragment') || txt.includes('mind fragment') || txt.includes('body fragment');
   const isCreature = ((atk > 0 || def > 0) || (id !== "0" && isFragment)) && id !== "0";
   const isSpell = !isCreature && id !== "0";
 
@@ -56,10 +56,10 @@ const parseCardData = (id) => {
   if (drawM && !/attack.*draw/i.test(eff) && !/opponent.*draw/i.test(eff))
     e.onSummonDraw = parseInt(drawM[1]);
 
-  if (/gain (\d+) extra life/i.test(eff) || /gain (\d+).*life/i.test(eff))
-    e.onSummonHeal = parseInt((eff.match(/(\d+).*life/i) || [0, 3])[1]);
-  else if (/heal.*?(\d+)/i.test(eff))
-    e.onSummonHeal = parseInt((eff.match(/heal.*?(\d+)/i) || [0, 3])[1]);
+  if (/gain (\d+) extra life/i.test(eff) || /gain (\d+).*life/i.test(eff) || /heal.*?(\d+)/i.test(eff)) {
+    const healM = eff.match(/gain (\d+).*life/i) || eff.match(/heal.*?(\d+)/i) || eff.match(/(\d+).*life/i);
+    if (healM) e.onSummonHeal = parseInt(healM[1] || healM[2]);
+  }
 
   if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff))
     e.onSummonDiscardOpp = parseInt((eff.match(/discard (\d+)/i) || [0, 1])[1]);
@@ -71,8 +71,10 @@ const parseCardData = (id) => {
     e.onSummonDmgAll = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
   else if (/(\d+) damage to.*opponent.*life|(\d+) damage to opponent/i.test(eff))
     e.onSummonDmgPlayer = parseInt((eff.match(/(\d+) damage/i) || [0, 2])[1]);
-  else if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/attack/i.test(eff) && !/end of/i.test(eff))
+  if (/deal (\d+) damage/i.test(eff) && !/destroyed/i.test(eff) && !/attack/i.test(eff) && !/end of/i.test(eff)) {
     e.onSummonDmgTargetEnemy = parseInt((eff.match(/deal (\d+) damage/i) || [0, 2])[1]);
+    if (/of your choice/i.test(eff)) e.targetChoice = true;
+  }
 
   // Destroy cards
   if (/destroy all.*fly/i.test(eff)) e.onSummonDestroyTypeFly = true;
@@ -188,6 +190,8 @@ const parseCardData = (id) => {
   // ====== GRAVEYARD RETURN ======
   if (/return all destroyed cards to owners' hands/i.test(eff))
     e.onSummonReturnAllGrave = true;
+  if (/return.*fragment.*discard pile to.*deck/i.test(eff))
+    e.onSummonShuffleFragments = true;
 
   // ====== SACRIFICE ======
   if (/requires.*sacrifice.*?(\d+)/i.test(eff)) {
@@ -330,7 +334,12 @@ function App() {
       const setEGrave = isPlayer ? setOppGrave : setGrave;
       setEnemy(prev => {
         if (!prev.length) return prev;
-        const idx = Math.floor(Math.random() * prev.length);
+        // If 'choice', pick strongest enemy
+        let idx = Math.floor(Math.random() * prev.length);
+        if (e.targetChoice) {
+          let maxH = -1;
+          prev.forEach((c, i) => { const def = parseCardData(c.cardId).defense; if (def > maxH) { maxH = def; idx = i; } });
+        }
         const tgt = prev[idx];
         const ci = parseCardData(tgt.cardId);
         if (ci.defense <= e.onSummonDmgTargetEnemy) {
@@ -445,6 +454,17 @@ function App() {
       setGrave([]);
       setOppGrave([]);
       addLog(`[EFFECT] ${info.id}: ALL GRAVEYARDS RETURNED TO HANDS`);
+    }
+    // Shuffle fragments from grave into deck (#244)
+    if (e.onSummonShuffleFragments) {
+      const myGrave = isPlayer ? grave : oppGrave;
+      const setMyGrave = isPlayer ? setGrave : setOppGrave;
+      const setMyDeck = isPlayer ? setDeck : setOppDeck;
+      const frags = myGrave.filter(cid => parseCardData(cid).effects.winCombo);
+      const others = myGrave.filter(cid => !parseCardData(cid).effects.winCombo);
+      setMyGrave(others);
+      setMyDeck(prev => [...prev, ...frags].sort(() => Math.random() - 0.5));
+      addLog(`[EFFECT] ${info.id}: RETURNED ${frags.length} FRAGMENTS TO DECK`);
     }
     // Search Deck / Library (randomized for simplicity)
     if (e.onSummonSearch) {
