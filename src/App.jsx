@@ -91,6 +91,9 @@ const parseCardData = (id) => {
   } else if (/summon.*?(\d+)\/(\d+)/i.test(eff) && !/attack|destroyed/i.test(eff)) {
     const tm = eff.match(/summon.*?(\d+)\/(\d+)/i);
     if (tm) e.onSummonToken = { atk: +tm[1], def: +tm[2], count: parseInt((eff.match(/summon (\d+) /i) || [0, 1])[1]) };
+  } else if (/summon.*?(\d+).*?token/i.test(eff) && !/attack|destroyed/i.test(eff)) {
+    const tm = eff.match(/summon.*?(\d+).*?token/i);
+    if (tm) e.onSummonToken = { count: +tm[1], atk: 1, def: 1 };
   }
 
   // Buff own cards on summon
