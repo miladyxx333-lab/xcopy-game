@@ -178,6 +178,7 @@ const parseCardData = (id) => {
   }
 
   // ====== COUNTER / INSTANT ======
+  if (/counter.*opponent.*card|negat.*opponent.*card/i.test(eff)) e.onSummonCounter = true;
   if (/counter/i.test(eff)) e.isCounter = true;
 
   // ====== IMMUNITY / SHIELD ======
@@ -497,6 +498,21 @@ function App() {
       addLog(`[WHEEL] ${info.id}: OPPONENT HAND HAS BEEN RELOADED!`);
     }
     // Return all graveyard cards to hand (#120)
+    if (e.onSummonCounter) {
+      setExecutionStack(prev => {
+        if (!prev.length) { addLog("> COUNTER: NOTHING IN STACK TO NEGATE"); return prev; }
+        const last = prev[prev.length - 1];
+        // If the last card in stack is from opponent, negate it
+        if (last.owner !== (isPlayer ? 'PLAYER' : 'AI')) {
+           const negatedCid = last.cardId;
+           addLog(`[COUNTER] ${info.id}: NEGATED ${negatedCid}!`);
+           (isPlayer ? setOppGrave : setGrave)(g => [...g, negatedCid]);
+           return prev.slice(0, -1);
+        }
+        addLog("> COUNTER: CANNOT NEGATE OWN STACK");
+        return prev;
+      });
+    }
     if (e.onSummonReturnAllGrave) {
       setHand(prev => [...prev, ...grave]);
       setOppHand(prev => [...prev, ...oppGrave]);
@@ -712,8 +728,17 @@ function App() {
   const playCard = (index) => {
     const cardId = hand[index];
     const card = parseCardData(cardId);
-    const canPlay = (turn === 'PLAYER' && phase === 'MAIN') || (turn === 'AI' && phase === 'DECLARE_BLOCKS' && card.effects.isInstant);
+    const isCounter = card.effects.onSummonCounter || card.effects.isCounter;
+    
+    // Stack Response: allow Counter if stack has items
+    if (executionStack.length > 0 && !isCounter) {
+      addLog("! STACK BUSY. WAIT FOR RESOLUTION."); 
+      return; 
+    }
+
+    const canPlay = (turn === 'PLAYER' && phase === 'MAIN') || (turn === 'AI' && phase === 'DECLARE_BLOCKS' && card.effects.isInstant) || isCounter;
     if (!canPlay) return;
+
     if (cardId === "0") {
       setHand(h => { const n = [...h]; n.splice(index, 1); return n; });
       setSoup(s => ({ current: s.current + 1, max: s.max + 1 }));
