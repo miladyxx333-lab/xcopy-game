@@ -451,33 +451,47 @@ function App() {
         let idx = Math.floor(Math.random() * prev.length);
         if (e.targetChoice) {
           let maxH = -1;
-          prev.forEach((c, i) => { const def = parseCardData(c.cardId).defense; if (def > maxH) { maxH = def; idx = i; } });
+          prev.forEach((c, i) => { const def = parseCardData(c.cardId).defense + (c.defMod || 0); if (def > maxH) { maxH = def; idx = i; } });
         }
         const tgt = prev[idx];
         const ci = parseCardData(tgt.cardId);
-        if (ci.defense <= e.onSummonDmgTargetEnemy) {
+        const currentDef = ci.defense + (tgt.defMod || 0);
+        if (currentDef <= e.onSummonDmgTargetEnemy) {
           setEGrave(g => [...g, tgt.cardId]);
           addLog(`[EFFECT] ${info.id}: TARGETED ${tgt.cardId} → DESTROYED`);
           return prev.filter((_, i) => i !== idx);
         }
         addLog(`[EFFECT] ${info.id}: HIT ${tgt.cardId} FOR ${e.onSummonDmgTargetEnemy}`);
-        return prev;
+        return prev.map((c, i) => i === idx ? { ...c, defMod: (c.defMod || 0) - e.onSummonDmgTargetEnemy } : c);
       });
     }
     if (e.onSummonDmgAllEnemy) {
-      const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
-      const setEGrave = isPlayer ? setOppGrave : setGrave;
-      setEnemy(prev => prev.filter(c => {
-        const d = parseCardData(c.cardId).defense;
-        if (d <= e.onSummonDmgAllEnemy) { setEGrave(g => [...g, c.cardId]); addLog(`[EFFECT] AOE KILLED ${c.cardId}`); return false; }
-        addLog(`[EFFECT] ${c.cardId} SURVIVED AOE (DEF ${d} > DMG ${e.onSummonDmgAllEnemy})`);
-        return true;
-      }));
+       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;
+       const setEGrave = isPlayer ? setOppGrave : setGrave;
+       setEnemy(prev => {
+          return prev.map(c => {
+             const def = parseCardData(c.cardId).defense + (c.defMod || 0);
+             const newDef = def - e.onSummonDmgAllEnemy;
+             if (newDef <= 0) { setEGrave(g => [...g, c.cardId]); return null; }
+             return { ...c, defMod: (c.defMod || 0) - e.onSummonDmgAllEnemy };
+          }).filter(c => c !== null);
+       });
+       addLog(`[EFFECT] ${info.id}: ${e.onSummonDmgAllEnemy} DMG TO ALL ENEMY UNITS`);
     }
+
     if (e.onSummonDmgAll) {
       const dmg = e.onSummonDmgAll;
-      setPlayArea(prev => prev.filter(c => { if (parseCardData(c.cardId).defense <= dmg) { setGrave(g => [...g, c.cardId]); return false; } return true; }));
-      setOppPlayArea(prev => prev.filter(c => { if (parseCardData(c.cardId).defense <= dmg) { setOppGrave(g => [...g, c.cardId]); return false; } return true; }));
+      const handleGlobalDmg = (prev, setG) => {
+         return prev.map(c => {
+            const def = parseCardData(c.cardId).defense + (c.defMod || 0);
+            const newDef = def - dmg;
+            if (newDef <= 0) { setG(g => [...g, c.cardId]); return null; }
+            return { ...c, defMod: (c.defMod || 0) - dmg };
+         }).filter(c => c !== null);
+      };
+      setPlayArea(p => handleGlobalDmg(p, setGrave));
+      setOppPlayArea(p => handleGlobalDmg(p, setOppGrave));
+      addLog(`[EFFECT] ${info.id}: ${dmg} DMG TO EVERY UNIT IN PLAY`);
     }
     if (e.onSummonDiscardOpp) {
       addLog(`[EFFECT] ${info.id}: INITIATING DISCARD...`);
