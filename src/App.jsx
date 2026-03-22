@@ -16,10 +16,11 @@ const parseCardData = (id) => {
   if (id.startsWith('TOKEN_')) {
     const m = id.match(/TOKEN_(\d+)_(\d+)/);
     const type = id.includes('_DEATH') ? 'death' : id.includes('_DOOM') ? 'doom' : id.includes('_FLY') ? 'fly' : 'neutral';
-    return { id, rawText: 'Token', cost: 0, attack: m ? +m[1] : 1, defense: m ? +m[2] : 1, isCreature: true, cardType: type, effects: {} };
+    return { id, rawText: 'Token', cost: 0, attack: m ? +m[1] : 5, defense: m ? +m[2] : 5, isCreature: true, cardType: type, effects: {} };
   }
   const c = cardsData.find(c => c.id === id) || { id, rawText: 'No Data' };
   const txt = (c.rawText || '').toLowerCase();
+  const norm = txt.replace(/\n/g, ' ');
 
   let cost = 0;
   const cMatch = txt.match(/cost[: ]*\s*(\d+)/);
@@ -53,14 +54,14 @@ const parseCardData = (id) => {
   if (/gain (\d+) can/i.test(eff) && !/destroyed/i.test(eff) && !/attack/i.test(eff))
     e.onSummonGainSoup = parseInt((eff.match(/gain (\d+) can/i) || [0, 1])[1]);
 
-  const drawM = eff.match(/draw (\d+) card/i);
-  if (drawM && !/attack.*draw/i.test(eff) && !/opponent.*draw/i.test(eff))
-    e.onSummonDraw = parseInt(drawM[1]);
-  if (/draw a card/i.test(eff) && !/attack/i.test(eff)) e.onSummonDraw = 1;
+  const drawM = norm.match(/draw (\d+) card/i) || norm.match(/draw one card/i);
+  if (drawM && !/attack.*draw/i.test(norm) && !/opponent.*draw/i.test(norm)) {
+     if (drawM[1]) e.onSummonDraw = parseInt(drawM[1]);
+     else e.onSummonDraw = 1;
+  }
 
-  if (/draw.*both/i.test(eff)) e.onSummonDrawBoth = parseInt((eff.match(/draw (\d+)/i) || [0, 1])[1]);
-  
-  if (/lose.*draw phase/i.test(eff)) e.onSummonSkipDrawNext = true;
+  if (/draw.*both/i.test(norm)) e.onSummonDrawBoth = parseInt((norm.match(/draw (\d+)/i) || [0, 1])[1]);
+  if (/lose.*draw phase/i.test(norm)) e.onSummonSkipDrawNext = true;
 
   if (/(heal|gain).*?(\d+).*?(health|life|hp)/i.test(eff) || /heal.*?by (\d+)/i.test(eff) || /gain (\d+).*?life/i.test(eff)) {
     const healM = eff.match(/(\d+)/);
