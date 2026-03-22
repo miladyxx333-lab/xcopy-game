@@ -64,7 +64,9 @@ const parseCardData = (id) => {
 
   if (/discard.*opponent|opponent.*discard|force.*discard/i.test(eff) && !/attack/i.test(eff)) {
     const discardM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*discard/i);
-    e.onSummonDiscardOpp = discardM ? parseInt(discardM[1]) : 1;
+    const amt = discardM ? parseInt(discardM[1]) : 1;
+    if (/once per turn/i.test(eff)) e.onAttackDiscardOpp = amt;
+    else e.onSummonDiscardOpp = amt;
   }
 
   // Damage: all enemy > all cards > player HP > single target
@@ -388,6 +390,12 @@ function App() {
     if (e.onSummonDiscardOpp) {
       (isPlayer ? setOppHand : setHand)(h => { if (!h.length) return h; const n = [...h]; n.splice(Math.floor(Math.random() * n.length), 1); return n; });
       addLog(`[EFFECT] ${info.id}: FORCED DISCARD!`);
+    }
+    if (e.onSummonWheel) {
+      const setOppH = isPlayer ? setOppHand : setHand;
+      setOppH([]);
+      for (let i = 0; i < 5; i++) drawCard(!isPlayer);
+      addLog(`[WHEEL] ${info.id}: OPPONENT HAND HAS BEEN RELOADED!`);
     }
     if (e.onSummonDestroyStrongest) {
       const setEnemy = isPlayer ? setOppPlayArea : setPlayArea;

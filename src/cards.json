@@ -207,7 +207,7 @@
   {
     "id": "135",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/135.png",
-    "rawText": "FOMO\n| a\nelon Colamco cdl Go Zoo\n- |\n| i\nCost: 4 cans. Attack: 5.\nDefense: 3. Effect: Once per\nturn, discard 1 card from your\nopponent's hand. Flavor Text:\nHarvesting the seeds of\ndespair, sowing doom in every\ncorner.\na"
+    "rawText": "FOMO\nTYPE: DOOM\nCost: 4 cans. Attack: 5. Defense: 3. Effect: Once per turn, discard 1 card from your opponent's hand."
   },
   {
     "id": "136",
@@ -352,7 +352,7 @@
   {
     "id": "163",
     "originalImage": "/Users/urielhernandez/Downloads/xcopy/xcopy png/163.png",
-    "rawText": "MORTAL\nTr =u\nhl\n| | | |\n& i\n| | ! |\nAR RNLE\n| BB ‘ | : |\nSLi En\n‘ aR\ni d\nTYPE: DOOM\nCost: 5 cans. Attack: 6. Defense: 4.\nEffect: Once per game, deal 3\ndamage to an enemy card of your\nchoice. Flavor Text: A summoner of\ndoom, whose whispers bring the end\ncloser.\na"
+    "rawText": "MORTAL\nTYPE: DOOM\nCost: 5 cans. Attack: 6. Defense: 4. Effect: Once per game, deal 3 damage to an enemy card of your choice."
   },
   {
     "id": "164",
