@@ -233,21 +233,36 @@ const parseCardData = (id) => {
      else if (/fly/i.test(eff)) e.buffType = 'fly';
   }
 
-  // ====== ACTIVATED ABILITIES (V10) ======
-  if (/pay (\d+) (energy|can)|sacrifice.*summon|once per turn.*lose/i.test(eff)) {
-     const payCostM = eff.match(/pay (\d+)/i);
-     const payCost = payCostM ? parseInt(payCostM[1]) : 0;
-     e.activatedAbility = { cost: payCost };
-     if (/sacrifice.*summon|summon/i.test(eff) && /sacrifice/i.test(eff)) {
-        const sm = eff.match(/summon.*?(\d+)\/(\d+)/i) || eff.match(/sumon.*?(\d+)\/(\d+)/i);
-        e.activatedAbility.sacrifice = 1;
-        if (sm) e.activatedAbility.summon = { atk: +sm[1], def: +sm[2] };
-     }
-     if (/lose all abilities/i.test(eff)) e.activatedAbility.silenceEnemy = true;
-     if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
-     if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
-     if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
-  }
+   // ====== ACTIVATED ABILITIES (V10) ======
+   if (/pay (\d+) (energy|can)|sacrifice.*summon|once per turn.*lose|discard.*then.*draw/i.test(eff)) {
+      const payCostM = eff.match(/pay (\d+)/i);
+      const payCost = payCostM ? parseInt(payCostM[1]) : 0;
+      e.activatedAbility = { cost: payCost };
+      
+      const discM = eff.match(/discard.*?(\d+)/i) || eff.match(/(\d+).*?discard/i);
+      if (discM) {
+         const amt = parseInt(discM[1]) || 1;
+         if (/all players|each player/i.test(norm)) e.activatedAbility.discardAll = amt;
+         else if (/opponent/i.test(norm)) e.activatedAbility.discardOpp = amt;
+         else e.activatedAbility.discardSelf = amt;
+      }
+      const dM = norm.match(/draw.*?(\d+)/i) || norm.match(/(\d+).*?draw/i);
+      if (dM && (/pay|sacrifice|then/i.test(norm))) {
+         const amt = parseInt(dM[1]) || 1;
+         if (/each player|both/i.test(norm)) e.activatedAbility.drawBoth = amt;
+         else e.activatedAbility.drawSelf = amt;
+      }
+
+      if (/sacrifice.*summon|summon/i.test(eff) && /sacrifice/i.test(eff)) {
+         const sm = eff.match(/summon.*?(\d+)\/(\d+)/i) || eff.match(/sumon.*?(\d+)\/(\d+)/i);
+         e.activatedAbility.sacrifice = 1;
+         if (sm) e.activatedAbility.summon = { atk: +sm[1], def: +sm[2] };
+      }
+      if (/lose all abilities/i.test(eff)) e.activatedAbility.silenceEnemy = true;
+      if (/deal (\d+) damage to all cards/i.test(eff)) e.activatedAbility.dmgAll = parseInt((eff.match(/deal (\d+)/i) || [0, 2])[1]);
+      if (/return.*graveyard/i.test(eff)) e.activatedAbility.returnGrave = 1;
+      if (e.activatedAbility.silenceEnemy || /once per turn/i.test(eff)) e.oncePerTurn = true;
+   }
   
   if (/all cards take (\d+) damage.*end of each turn/i.test(norm))
     e.onEndTurnDmgAllUnits = parseInt((norm.match(/(\d+)/i) || [0, 1])[1]);
@@ -506,13 +521,14 @@ function App() {
       addLog(`[EFFECT] ${info.id}: ${dmg} DMG TO EVERY UNIT IN PLAY`);
     }
     if (e.onSummonDiscardOpp) {
-      addLog(`[EFFECT] ${info.id}: INITIATING DISCARD...`);
+      const amt = e.onSummonDiscardOpp;
       (isPlayer ? setOppHand : setHand)(h => { 
-        if (!h.length) { addLog(`[EFFECT] ${info.id}: TARGET HAND EMPTY`); return h; } 
-        const n = [...h]; n.splice(Math.floor(Math.random() * n.length), 1); 
+        if (!h.length) { addLog(`[EXECUTION] ${info.id}: OPPONENT HAND EMPTY - NO DISCARD`); return h; } 
+        let n = [...h];
+        for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random() * n.length), 1); 
+        addLog(`[EXECUTION] ${info.id}: FORCED ${amt} DISCARD(S) FROM ENEMY HAND`);
         return n; 
       });
-      addLog(`[EFFECT] ${info.id}: FORCED DISCARD COMPLETED`);
     }
     if (e.onSummonDiscardSelf) {
        setHand(h => { let n = [...h]; for(let i=0; i<e.onSummonDiscardSelf && n.length; i++) n.splice(Math.floor(Math.random()*n.length),1); return n; });
@@ -1375,11 +1391,19 @@ function App() {
           return n;
        });
     }
-    if (abil.discard) {
-       setHand(h => { let n = [...h]; for(let i=0; i<abil.discard && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
-       setOppHand(h => { let n = [...h]; for(let i=0; i<abil.discard && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+    if (abil.discardAll) {
+       const amt = abil.discardAll;
+       setHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+       setOppHand(h => { let n = [...h]; for(let i=0; i<amt && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
     }
-    if (abil.draw) { for(let i=0; i<abil.draw; i++) drawCard(isP); }
+    if (abil.discardOpp) {
+       (isP ? setOppHand : setHand)(h => { let n = [...h]; for(let i=0; i<abil.discardOpp && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+    }
+    if (abil.discardSelf) {
+       (isP ? setHand : setOppHand)(h => { let n = [...h]; for(let i=0; i<abil.discardSelf && n.length; i++) n.splice(Math.floor(Math.random()*n.length), 1); return n; });
+    }
+    if (abil.drawSelf) { for(let i=0; i<abil.drawSelf; i++) drawCard(isP); }
+    if (abil.drawBoth) { for(let i=0; i<abil.drawBoth; i++) { drawCard(true); drawCard(false); } }
     if (abil.cheatIntoPlay) {
        const h = isP ? hand : oppHand;
        if (!h.length) { addLog("! HAND IS EMPTY"); return; }
