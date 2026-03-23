@@ -14,7 +14,8 @@ const BOOSTERS = [
 function Landing() {
   const [scrollY, setScrollY] = useState(0)
   const [hovered, setHovered] = useState(null)
-  const [cartCount, setCartCount] = useState(0)
+  const [cart, setCart] = useState([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
   const [featIdx, setFeatIdx] = useState(0)
 
@@ -30,10 +31,37 @@ function Landing() {
   }, [])
 
   const addToCart = (booster) => {
-    setCartCount(c => c + 1)
+    setCart(prev => {
+      const existing = prev.find(item => item.id === booster.id)
+      if (existing) {
+        return prev.map(item => item.id === booster.id ? { ...item, qty: item.qty + 1 } : item)
+      }
+      return [...prev, { ...booster, qty: 1 }]
+    })
     setShowNotif(true)
     setTimeout(() => setShowNotif(false), 2000)
   }
+
+  const removeFromCart = (id) => {
+    setCart(prev => prev.filter(item => item.id !== id))
+  }
+
+  const updateQty = (id, delta) => {
+    setCart(prev => prev.map(item => {
+      if (item.id === id) {
+        const n = Math.max(1, item.qty + delta)
+        return { ...item, qty: n }
+      }
+      return item
+    }))
+  }
+
+  const cartTotal = cart.reduce((acc, item) => {
+    const p = parseFloat(item.price.replace('$', ''))
+    return acc + (p * item.qty)
+  }, 0)
+
+  const cartCount = cart.reduce((acc, item) => acc + item.qty, 0)
 
   return (
     <div className="landing">
@@ -47,7 +75,10 @@ function Landing() {
           <a href="#gallery">GALLERY</a>
           <a href="#store">STORE</a>
           <Link to="/play" className="nav-play-btn">▶ PLAY NOW</Link>
-          <div className="nav-cart">🛒 <span className="cart-count">{cartCount}</span></div>
+          <div className="nav-cart" onClick={() => setIsCartOpen(true)}>
+            <span className="cart-icon">🛒</span>
+            {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+          </div>
         </div>
       </nav>
 
@@ -219,6 +250,55 @@ function Landing() {
           <div className="footer-copy">© 2026 XCOPY::ARENA — Fan Project — All Art © XCOPY</div>
         </div>
       </footer>
+
+      {/* CART DRAWER */}
+      <div className={`cart-drawer ${isCartOpen ? 'cart-drawer-open' : ''}`}>
+        <div className="cart-overlay" onClick={() => setIsCartOpen(false)} />
+        <div className="cart-content">
+          <div className="cart-header">
+            <h3>ORDER_SUMMARY</h3>
+            <button className="cart-close" onClick={() => setIsCartOpen(false)}>×</button>
+          </div>
+
+          <div className="cart-items">
+            {cart.length === 0 ? (
+              <div className="empty-cart-msg">Your collection is empty... for now.</div>
+            ) : (
+              cart.map(item => (
+                <div key={item.id} className="cart-item" style={{ '--item-color': item.color }}>
+                  <div className="cart-item-info">
+                    <div className="cart-item-icon">{item.icon}</div>
+                    <div className="cart-item-meta">
+                      <div className="cart-item-name">{item.name}</div>
+                      <div className="cart-item-price">{item.price}</div>
+                    </div>
+                  </div>
+                  <div className="cart-item-actions">
+                    <div className="qty-controls">
+                      <button onClick={() => updateQty(item.id, -1)}>−</button>
+                      <span>{item.qty}</span>
+                      <button onClick={() => updateQty(item.id, 1)}>+</button>
+                    </div>
+                    <button className="remove-item" onClick={() => removeFromCart(item.id)}>REMOVE</button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {cart.length > 0 && (
+            <div className="cart-footer">
+              <div className="cart-total">
+                <span>TOTAL</span>
+                <span className="total-amount">${cartTotal.toFixed(2)}</span>
+              </div>
+              <button className="checkout-btn" onClick={() => alert('Proceeding to encrypted checkout...')}>
+                SIGN & CHECKOUT
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* NOTIFICATION */}
       {showNotif && (
