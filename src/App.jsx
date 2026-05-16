@@ -326,6 +326,12 @@ const parseCardData = (id) => {
 const INITIAL_HP = 30;
 
 function App() {
+  // Lock body scroll while the game is mounted; restore on exit
+  useEffect(() => {
+    document.body.classList.add('game-active');
+    return () => document.body.classList.remove('game-active');
+  }, []);
+
   const [turn, setTurn] = useState('PLAYER');
   const [phase, setPhase] = useState('MAIN');
   const [gameStarted, setGameStarted] = useState(false);

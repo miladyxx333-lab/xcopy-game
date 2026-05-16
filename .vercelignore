@@ -1,0 +1,10 @@
+dist
+scripts/ipfs-prep
+artifacts
+cache
+contracts
+hardhat.config.cjs
+eng.traineddata
+node_modules
+manifold-csvs
+*.zip

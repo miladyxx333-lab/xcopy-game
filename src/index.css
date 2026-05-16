@@ -16,22 +16,26 @@
   padding: 0;
 }
 
+/* Default body — scrollable, used by the landing page */
 body {
   background-color: var(--bg-black);
   color: white;
   font-family: 'Share Tech Mono', monospace;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background-image: 
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-image:
     linear-gradient(var(--grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-#root {
-  height: 100%;
+/* Game-active class — added by App.jsx, removed on unmount */
+body.game-active {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
+body.game-active #root { height: 100%; }
 
 .game-board {
   display: grid;
@@ -316,4 +320,115 @@ body {
 .grave-opponent {
   border-color: var(--neon-red);
   color: var(--neon-red);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GAME ARENA — mobile responsive
+═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  /* Board: stack vertically, enable scroll */
+  .game-board {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+    gap: 6px;
+    padding: 0 0 20px;
+  }
+
+  .hud {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(6,6,6,0.95);
+    backdrop-filter: blur(4px);
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 6px;
+    height: auto;
+  }
+
+  .player-info {
+    font-size: 0.75rem;
+    gap: 8px;
+    letter-spacing: 1px;
+  }
+
+  .game-status { font-size: 0.75rem; }
+  .turn-indicator { font-size: 0.7rem; letter-spacing: 2px; }
+
+  /* Table fills width */
+  .table {
+    width: 100%;
+    padding: 8px;
+    gap: 12px;
+  }
+
+  /* Zones wrap smaller cards */
+  .zone { gap: 4px; padding: 4px; flex-wrap: wrap; justify-content: center; }
+
+  /* Card sizes — smaller on mobile */
+  .card-field { width: 52px; height: 72px; }
+  .card-hand  { width: 60px; height: 82px; }
+  .card-soup  { width: 44px; height: 60px; }
+  .card-placeholder { font-size: 0.5rem; border-radius: 4px; }
+
+  /* Hand — horizontal scroll */
+  .hand {
+    min-height: 95px;
+    overflow-x: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    padding: 8px 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .hand::-webkit-scrollbar { display: none; }
+
+  /* Side zones — horizontal row below board */
+  .side-zones {
+    grid-row: 3;
+    flex-direction: row;
+    border-left: none;
+    border-top: 1px solid rgba(0,255,255,0.15);
+    overflow-x: auto;
+    padding: 12px;
+    gap: 12px;
+    justify-content: center;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .deck-zone, .grave-zone {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .deck-slot, .grave-slot {
+    width: 65px;
+    height: 90px;
+    font-size: 0.65rem;
+  }
+
+  /* Execution stack — compact */
+  .execution-stack { height: 100px; }
+  .stack-title { font-size: 0.65rem; padding: 3px; }
+  .stack-slot  { width: 55px; height: 72px; font-size: 0.65rem; }
+  .stack-area  { gap: 8px; padding: 8px; }
+
+  /* Neon boxes — reduce padding */
+  .neon-box-cyan, .neon-box-red { padding: 3px 8px; }
+}
+
+/* ── Very small phones ──────────────────────────────── */
+@media (max-width: 380px) {
+  .card-field { width: 44px; height: 60px; }
+  .card-hand  { width: 52px; height: 70px; }
+  .card-soup  { width: 38px; height: 52px; }
+  .player-info { font-size: 0.65rem; gap: 5px; }
+  .hud        { padding: 6px 8px; }
+  .deck-slot, .grave-slot { width: 55px; height: 75px; }
 }
