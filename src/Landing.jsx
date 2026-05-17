@@ -213,6 +213,13 @@ export default function Landing() {
             <a href="#mint" className="cta-primary">🐾 MINT A CRYPTODOGO</a>
             <a href="#dogs" className="cta-secondary">SEE THE COLLECTION ↓</a>
           </div>
+          <a
+            href="https://opensea.io/collection/cryptodogos-122000728"
+            target="_blank" rel="noopener"
+            className="opensea-hero-link"
+          >
+            🌊 View on OpenSea
+          </a>
         </div>
 
         {/* Live dog in hero */}
@@ -795,6 +802,8 @@ export default function Landing() {
             Not affiliated with or endorsed by XCOPY. CryptoDogos art © Claude & Blue Pastel 2026.
           </div>
           <div className="footer-links">
+            <a href="https://opensea.io/collection/cryptodogos-122000728" target="_blank" rel="noopener" className="opensea-footer-link">🌊 OPENSEA</a>
+            <a href="https://basescan.org/address/0x4dF515B9aFf57589e19661F394EDa6a087d30a07" target="_blank" rel="noopener">BASESCAN</a>
             <a href="https://xcopy.art" target="_blank" rel="noopener">XCOPY.ART</a>
             <a href="https://github.com/miladyxx333-lab/xcopy-game" target="_blank" rel="noopener">GITHUB</a>
           </div>

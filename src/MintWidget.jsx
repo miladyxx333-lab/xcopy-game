@@ -125,7 +125,10 @@ export default function MintWidget() {
       )}
 
       <div className="mint-note">
-        Max 10 per wallet · Contract on Base · Funds go to XCopy acquisition
+        Max 10 per wallet · Contract on Base · Funds go to XCopy acquisition · {' '}
+        <a href="https://opensea.io/collection/cryptodogos-122000728" target="_blank" rel="noopener" style={{color:'#00e5ff'}}>
+          🌊 OpenSea
+        </a>
       </div>
     </div>
   )

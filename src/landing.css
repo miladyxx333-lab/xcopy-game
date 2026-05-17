@@ -1307,3 +1307,21 @@ html {
 
 /* ── Scrollbar neon ───────────────────────────────────── */
 ::-webkit-scrollbar-thumb:hover { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+
+/* OpenSea links */
+.opensea-hero-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--head); font-size: 10px; letter-spacing: 2px;
+  color: #2081e2; text-decoration: none;
+  border: 1px solid #2081e222;
+  padding: 6px 14px;
+  transition: all .2s;
+}
+.opensea-hero-link:hover {
+  border-color: #2081e2;
+  box-shadow: 0 0 12px rgba(32,129,226,.4);
+  color: #4fa3ff;
+}
+.opensea-footer-link { color: #2081e2 !important; }
+.opensea-footer-link:hover { color: #4fa3ff !important; text-shadow: 0 0 8px rgba(32,129,226,.6); }
