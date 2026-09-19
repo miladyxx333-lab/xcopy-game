@@ -1632,16 +1632,35 @@ function App() {
   // ---- GAME OVER ----
   if (winner) {
     const isPlayerWin = winner.startsWith('PLAYER ONE');
+    const urlParams = new URLSearchParams(window.location.search);
+    const arenaMode = urlParams.get('mode'); // 'fortress' | 'guardian'
+
+    let winTitle = '¡VICTORIA!';
+    let winSubtitle = '⚡ ¡HAS DERROTADO AL SERVIDOR I.A.! TELETRANSPORTANDO AL MAPA...';
+    let winBtnText = '🏆 REGRESAR AL MAPA (RECLAMAR RECOMPENSA)';
+
+    if (arenaMode === 'fortress') {
+      winTitle = '🤖 ¡VICTORIA EN LA FORTALEZA!';
+      winSubtitle = '🤖 ¡HAS DERROTADO A LA I.A.! TELETRANSPORTANDO AL MAPA CON TU NUEVO ALIADO ROBOT...';
+      winBtnText = '🤖 REGRESAR AL MAPA Y RECLAMAR ALIADO ROBOT';
+    } else if (arenaMode === 'guardian') {
+      winTitle = '⚡ ¡GUARDIÁN DERROTADO!';
+      winSubtitle = '⚡ ¡HAS DERROTADO AL GUARDIÁN DE LA I.A.! EL CAMPO DE FUERZA HA SIDO DESTRUIDO...';
+      winBtnText = '🚪 REGRESAR AL MAPA (ENTRAR AL LABERINTO)';
+    }
+
+    let defeatSubtitle = arenaMode === 'fortress'
+      ? '💀 LA I.A. TE HA DERROTADO. EL ALIADO ROBOT SIGUE BAJO CONTROL DEL SERVIDOR.'
+      : '💀 LA I.A. HA TERMINADO TU SISTEMA. PUEDES REINTENTAR O RETIRARTE AL MAPA.';
+
     return (
       <div className="game-board" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="neon-box-pink" style={{ padding: '40px 50px', textAlign: 'center', maxWidth: '620px', background: 'rgba(10,10,20,0.96)', border: isPlayerWin ? '2px solid #00ffff' : '2px solid #ff0055', boxShadow: isPlayerWin ? '0 0 35px rgba(0,255,255,0.45)' : '0 0 35px rgba(255,0,85,0.45)', borderRadius: '8px' }}>
-          <h1 className={isPlayerWin ? 'neon-text-cyan' : 'neon-text-red'} style={{ fontSize: '2.8rem', marginBottom: '12px', letterSpacing: '2px' }}>
-            {isPlayerWin ? '¡VICTORIA!' : 'DERROTA'}
+        <div className="neon-box-pink" style={{ padding: '40px 50px', textAlign: 'center', maxWidth: '640px', background: 'rgba(10,10,20,0.96)', border: isPlayerWin ? '2px solid #00ffff' : '2px solid #ff0055', boxShadow: isPlayerWin ? '0 0 35px rgba(0,255,255,0.45)' : '0 0 35px rgba(255,0,85,0.45)', borderRadius: '8px' }}>
+          <h1 className={isPlayerWin ? 'neon-text-cyan' : 'neon-text-red'} style={{ fontSize: '2.5rem', marginBottom: '12px', letterSpacing: '2px' }}>
+            {isPlayerWin ? winTitle : 'DERROTA'}
           </h1>
           <h2 style={{ color: 'white', margin: '15px 0', fontSize: '1.1rem', lineHeight: '1.5', fontFamily: 'monospace' }}>
-            {isPlayerWin 
-              ? '⚡ ¡HAS DERROTADO AL SERVIDOR I.A.! TELETRANSPORTANDO AL MAPA...' 
-              : '💀 LA I.A. HA TERMINADO TU SISTEMA. PUEDES REINTENTAR O RETIRARTE AL MAPA.'}
+            {isPlayerWin ? winSubtitle : defeatSubtitle}
           </h2>
           <div style={{ color: '#888', fontSize: '0.85rem', marginBottom: '20px', fontFamily: 'monospace' }}>
             STATUS: [{winner}]
@@ -1653,7 +1672,7 @@ function App() {
                 onClick={handleClaimVictory} 
                 style={{ padding: '12px 28px', background: 'rgba(0,255,255,0.2)', color: '#00ffff', border: '2px solid #00ffff', cursor: 'pointer', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1rem', letterSpacing: '1px', boxShadow: '0 0 15px rgba(0,255,255,0.4)', borderRadius: '4px' }}
               >
-                🏆 REGRESAR AL MAPA (RECLAMAR RECOMPENSA)
+                {winBtnText}
               </button>
             ) : (
               <>
