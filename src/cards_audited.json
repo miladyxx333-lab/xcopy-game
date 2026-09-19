@@ -1,0 +1,3209 @@
+[
+  {
+    "id": "0",
+    "name": "KING Cricket Soup",
+    "cost": 0,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "&) . R\\ 0",
+    "isFragment": false,
+    "effects": {
+      "isSoupResource": true
+    }
+  },
+  {
+    "id": "1",
+    "name": "Echoes of a Dead Earth",
+    "cost": 2,
+    "attack": 3,
+    "defense": 2,
+    "cardType": "fly",
+    "effectText": "When summoned, gain 1 can of KING Cricket Soup.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "10",
+    "name": "Chart Riot",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "When this card is destroyed, look on your deck and summon another Death card from your deck.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonFromDeck": "death",
+      "onDestroySingleType": "death"
+    }
+  },
+  {
+    "id": "100",
+    "name": "trigger_optics",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "Once per game, deal 4 damage to an enemy card with the highest defense.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgHighestDef": 4
+    }
+  },
+  {
+    "id": "101",
+    "name": "Let the bad times roll",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "fly",
+    "effectText": "When this card is destroyed, summon a 4/4 Fly card to the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 4,
+        "def": 4,
+        "type": "fly"
+      },
+      "onDestroySingleType": "fly"
+    }
+  },
+  {
+    "id": "102",
+    "name": "Skin, Bone, Blood",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "Deal 2 damage to all enemy cards when summoned. Flavor Text: A clap of thunder, and all that is beneath is struck down. a",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "103",
+    "name": "The State of Us (blue)",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "Once per game, deal 3 damage to a enemy card of your choice.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "104",
+    "name": "Card 104",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Whenever this card attacks summon a 1/1 Death token to your side.",
+    "isFragment": false,
+    "effects": {
+      "onAttackSummonToken": {
+        "count": 1,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "105",
+    "name": "mortal_",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "Once per game, summon 2 Death tokens to the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 2,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "106",
+    "name": "Mr. Elevator",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Whenever a Death card is summoned, this card gains +1 attack.",
+    "isFragment": false,
+    "effects": {
+      "onAllySummonGainAtk": {
+        "type": "death",
+        "amount": 1
+      }
+    }
+  },
+  {
+    "id": "107",
+    "name": "No Favour",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Once per turn, when this card attacks, the opponent discards 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDiscardOpp": 1
+    }
+  },
+  {
+    "id": "108",
+    "name": "py i ey",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "Whenever a Death card is destroyed, gain 1 can.",
+    "isFragment": false,
+    "effects": {
+      "onDeathGainSoup": 1
+    }
+  },
+  {
+    "id": "109",
+    "name": "VIPER",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "This card cannot be destroyed b Fly cards.",
+    "isFragment": false,
+    "effects": {
+      "immuneToFly": true,
+      "onDestroySingleType": "fly"
+    }
+  },
+  {
+    "id": "11",
+    "name": "A Coin for the Ferryman",
+    "cost": 4,
+    "attack": 5,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "When this card attacks, discard 1 random card from the opponent's hand.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDiscardOpp": 1
+    }
+  },
+  {
+    "id": "110",
+    "name": "Right-click and Save As girl",
+    "cost": 4,
+    "attack": 5,
+    "defense": 2,
+    "cardType": "death",
+    "effectText": "Once per game, deal 3 damage to all cards on the battlefield..",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 3
+    }
+  },
+  {
+    "id": "111",
+    "name": "eH ESOS BE EUR",
+    "cost": 7,
+    "attack": 8,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Once per game, destroy all card with a cost less than 5.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyByCost": 5
+    }
+  },
+  {
+    "id": "112",
+    "name": "Rubble",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Whenever this card is summoned, deal 2 damage to all enemy cards. a",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "113",
+    "name": "Splash",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "For every] Doom card on the battlefield, increase this card's attack b 1.",
+    "isFragment": false,
+    "effects": {
+      "scaleAtkPerFieldType": "doom"
+    }
+  },
+  {
+    "id": "114",
+    "name": "Puppy Therapy",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "Whenever an enemy card is destroyed, deal 2 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "115",
+    "name": "Bad Code",
+    "cost": 9,
+    "attack": 10,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Whenever a Doom card is played, gain 2 cans.",
+    "isFragment": false,
+    "effects": {
+      "onPlayTypeGainSoup": {
+        "type": "doom",
+        "amount": 2
+      }
+    }
+  },
+  {
+    "id": "116",
+    "name": "1",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Once per game, deal 4 damage to all cards on the opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 4
+    }
+  },
+  {
+    "id": "117",
+    "name": "| a5",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "doom",
+    "effectText": "Once per game, summon a 5/5 Doom card to the battlefield. Flavor Text: A knight whose very presence brings terror and doom. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 1,
+        "atk": 5,
+        "def": 5,
+        "type": "doom"
+      }
+    }
+  },
+  {
+    "id": "118",
+    "name": "hello admin dm me",
+    "cost": 8,
+    "attack": 9,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "Once per turn, give all Doom cards on the battlefield +1 attack for 1 turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "119",
+    "name": "In The Hole",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Whenever an enemy card is destroyed, destroy 1 enemy can. Flavor Text: A warlord forged from the blood of his enemies, he will never fall. a",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "12",
+    "name": "Death Dip",
+    "cost": 6,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "Corrupt 1 soup can on| your opponent's field on the end of the turn deal 1 damge to opponents life. Flavor Tex{] Once the decay begins, nothing can stop it LJ",
+    "isFragment": false,
+    "effects": {
+      "corruptSoupCan": true
+    }
+  },
+  {
+    "id": "120",
+    "name": "the appropriate loss of control",
+    "cost": 10,
+    "attack": 11,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Once per game, return all destroyed cards to their owners’ hands.",
+    "isFragment": false,
+    "effects": {
+      "onMassReviveToHand": true
+    }
+  },
+  {
+    "id": "121",
+    "name": "10th Floor Ethics",
+    "cost": 9,
+    "attack": 10,
+    "defense": 7,
+    "cardType": "neutral",
+    "effectText": "For every card you destroy, gain 1 can.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "122",
+    "name": "WeWork Boi",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "When summoned, draw 1 additional card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 1
+    }
+  },
+  {
+    "id": "123",
+    "name": "TRUTH or POWER",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "Once per turn, this card can deal 2 damage to an enemy card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 2
+    }
+  },
+  {
+    "id": "124",
+    "name": "A sea of motherfuckers on platform 24",
+    "cost": 7,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Once per game, deal 3 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 3
+    }
+  },
+  {
+    "id": "125",
+    "name": "...but you can't hang it on your wall",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "This card gains +1 attack for each other Fly card in play.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "126",
+    "name": "Gobshites",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Upon summoning, reduce the cost of one other Fly card in your hand by 2 cans.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "127",
+    "name": "Gods of Tesco Metro",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "When this card is destroyed, dea 2 damage to all enemy cards. Flavor Text: Born from the fury of the storm, it brings chaos wherever it flies. LJ",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "128",
+    "name": "The Deadness",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "When this card destroys an enemy, gain 1 can.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "129",
+    "name": "OBEDIENT",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "Whenever a card dies, you may deal 3 damage to an enemy card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "13",
+    "name": "Hyperion",
+    "cost": 4,
+    "attack": 5,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Destroy Fly card on the opponent's field when summoned.",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "fly"
+    }
+  },
+  {
+    "id": "130",
+    "name": "No Favour (cold)",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "neutral",
+    "effectText": "Once per game, destroy one of your opponent's cards with defense lower than this card's attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "131",
+    "name": "The Burning",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Once per turn, gain 1 can whenever a Death card is summoned.",
+    "isFragment": false,
+    "effects": {
+      "onPlayTypeGainSoup": {
+        "type": "death",
+        "amount": 1
+      }
+    }
+  },
+  {
+    "id": "132",
+    "name": "Best-case Scenario",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "Once per game, return a destroyed Death card from your graveyard to your hand.",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "death",
+      "onReturnFromGraveToHand": {
+        "type": "death",
+        "count": 1
+      }
+    }
+  },
+  {
+    "id": "133",
+    "name": "DISORDER",
+    "cost": 5,
+    "attack": 6,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When an enemy is destroyed, summon a 1/1 Death token to your side.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "134",
+    "name": "The Damage",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Deal 3 damage to all enemy cards on the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 3
+    }
+  },
+  {
+    "id": "135",
+    "name": "FOMO",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "Once per turn, discard 1 card from your opponent's hand.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "136",
+    "name": "RESIST",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Once per game, deal 5 damage to a single enemy card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 5
+    }
+  },
+  {
+    "id": "138",
+    "name": "Banksta",
+    "cost": 6,
+    "attack": 7,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Once per turn, decrease all enemy cards’ attack by 1 for 2 turns.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "139",
+    "name": "The Rabble",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Whenever a Doom card is summoned, this card gains +1 attack",
+    "isFragment": false,
+    "effects": {
+      "onAllySummonGainAtk": {
+        "type": "doom",
+        "amount": 1
+      }
+    }
+  },
+  {
+    "id": "14",
+    "name": "Card 14",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "when this car is summoned steal 1 can of soup from your opponent's field. Flavor Text: A mind that once fixed problems now only breaks them.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "140",
+    "name": "DOOM Party",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Once per game, destroy all card with a cost of 3 or less.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyByCost": 3
+    }
+  },
+  {
+    "id": "141",
+    "name": "Blood Run",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Whenever an enemy card is destroyed, summon a 2/2 Doom card to your side.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 2,
+        "def": 2,
+        "type": "doom"
+      },
+      "onDestroySingleType": "doom"
+    }
+  },
+  {
+    "id": "142",
+    "name": "Blood Bubble",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "Once per turn, gain 1 can for each Doo card on the battlefield. Flavor Text: A dreadlord whose grip tightens with each passing moment. a",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "143",
+    "name": "EXPOSURE",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Once per game, draw 3 cards and gain 2 cans.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 2,
+      "onSummonDraw": 3
+    }
+  },
+  {
+    "id": "144",
+    "name": "data_lords",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "When this card is summoned, deal 3 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 3
+    }
+  },
+  {
+    "id": "145",
+    "name": "One Love",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "Whenever this card attacks, summon a 1/1 Doom token to your side.",
+    "isFragment": false,
+    "effects": {
+      "onAttackSummonToken": {
+        "count": 1,
+        "atk": 1,
+        "def": 1,
+        "type": "doom"
+      }
+    }
+  },
+  {
+    "id": "146",
+    "name": "Infinite Burn",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "legendary",
+    "effectText": "For every Doom card in your hand, increase this card's attack b 1.",
+    "isFragment": false,
+    "effects": {
+      "scaleAtkPerFieldType": "doom"
+    }
+  },
+  {
+    "id": "147",
+    "name": "ART HISTORY: VOLUMES | - X",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "Once per game, when this card is destroyed, deal 4 damage to the enemy.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgTarget": 4
+    }
+  },
+  {
+    "id": "148",
+    "name": "PANIC STATIONS",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "When thig card attacks, deal 1 damage to all enemy cards. Flavor Text: Its cry can summon storms that devastate everything in their path.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDmgAllEnemy": 1
+    }
+  },
+  {
+    "id": "15",
+    "name": "Dissolution",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "After this card is destroy, deal 3 damage to all of the opponent’s cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 3
+    }
+  },
+  {
+    "id": "150",
+    "name": "BRITONS",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "fly",
+    "effectText": "When thi card is destroyed, summon if back to the battlefield in the next turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "151",
+    "name": "CITIZENS!",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "When this card is summoned, discard 1 card from your opponent's hand.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "152",
+    "name": "WFH_Death",
+    "cost": 6,
+    "attack": 7,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Every time you play a Fly card, increase this card’s attack by 1. Flavor Text: Its wings can stir the winds to uproot entire forests. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "153",
+    "name": "XCOPY 00-15",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Each time an enemy is destroyed, gain 1 attack point for this] card.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "154",
+    "name": "Card 154",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "Once per game, force your opponent to discard their highest-cost card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "155",
+    "name": "Back to School",
+    "cost": 6,
+    "attack": 7,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "When this card destroys another card, gain 1 can.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "156",
+    "name": "Hope",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "Whenever a Death card is destroyed, summon a 1/1 token to your side.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "157",
+    "name": "BROKEN",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Once per turn, deal 2 damage to a random enemy card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 2,
+      "onDestroyRandomEnemy": true
+    }
+  },
+  {
+    "id": "158",
+    "name": "The Other Deadness",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Deal 3 damage to all cards on the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 3
+    }
+  },
+  {
+    "id": "159",
+    "name": "EVADER",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "doom",
+    "effectText": "When summoned, deal 2 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "16",
+    "name": "Two Humans",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Destroy all FLY, DEATH cards in play from both players.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyAllType": "fly"
+    }
+  },
+  {
+    "id": "160",
+    "name": "Five Eyes",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "doom",
+    "effectText": "Once per game, destroy all card with 3 or less attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "161",
+    "name": "TERROR",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Deal 4 damage to all cards in play.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 4
+    }
+  },
+  {
+    "id": "162",
+    "name": "DEATHLESS",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Destroy 2 random enemy cards when this card is summoned.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyRandomEnemy": true
+    }
+  },
+  {
+    "id": "163",
+    "name": "MORTAL",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Once per game, deal 3 damage to an enemy card of your choice.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "164",
+    "name": "EYE-ROLLA",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "Gain +1 attack for each Fly card on your side of the field. Flavor Text: Silent watchers of the skies, vigilant and swift. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "165",
+    "name": "FOREVER EYE-ROLLA",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "neutral",
+    "effectText": "When this card attacks, destroy 1 token on the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "166",
+    "name": "Your new favourite t-shirt arrived",
+    "cost": 3,
+    "attack": 4,
+    "defense": 2,
+    "cardType": "fly",
+    "effectText": "If summoned at dusk, gain +2 attack this turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "167",
+    "name": "Cryptoart drama level (extreme)",
+    "cost": 5,
+    "attack": 7,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Deals 1 damage to an enemy card whenever it enters the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "168",
+    "name": "The Beast",
+    "cost": 6,
+    "attack": 8,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "Grants all Fly cards +1 defense while on the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "169",
+    "name": "; Te prs",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "neutral",
+    "effectText": "When destroyed, deal 3 damage to the opponent’s health.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgPlayer": 3
+    }
+  },
+  {
+    "id": "17",
+    "name": "Not So Fungible Offering",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "If a FLY card is summoned, all players lose 3 Life Points.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "170",
+    "name": "Gobble",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "Gain 1 can every time another card is destroyed.",
+    "isFragment": false,
+    "effects": {
+      "onDeathGainSoup": 1
+    }
+  },
+  {
+    "id": "171",
+    "name": "Beasts",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Summons a 2/2 token when this card destroys an enemy. Flavor Text: The swarm descends, leaving only silence. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "172",
+    "name": "Ghouls",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "Deals 1 damage to all cards upon entering the battlefield. Flavor Text: From the depths, it rises with a hunger for destruction. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 1
+    }
+  },
+  {
+    "id": "173",
+    "name": "the fuck you looking at?",
+    "cost": 5,
+    "attack": 6,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When this card is destroyed, reduce all enemy cards’ attack by 1.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "174",
+    "name": "a ~~",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "doom",
+    "effectText": "When summoned, destroy all cards with 4 or less defense.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "175",
+    "name": "The Doomed (red)",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "Each time a card is destroyed, this card gains +1 attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "176",
+    "name": "The Doomed (black & green)",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "doom",
+    "effectText": "Once per game, deal 5 damage to the opponent’s health.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgPlayer": 5
+    }
+  },
+  {
+    "id": "177",
+    "name": "The Doomed (black & red)",
+    "cost": 7,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "doom",
+    "effectText": "Cannot attack unless another Doom card is on the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "178",
+    "name": "InstaBags",
+    "cost": 7,
+    "attack": 8,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Once per turn, deal 2 damage to a card of your choice]",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 2
+    }
+  },
+  {
+    "id": "18",
+    "name": "J | |",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "neutral",
+    "effectText": "If this card is destroyed, both players lose 1 can of KING Cricket Soup.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "180",
+    "name": "Hayden Adams",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Deals 2 damage to the opponent's health at the end of each turn.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgPlayer": 2
+    }
+  },
+  {
+    "id": "181",
+    "name": "CryptoArtLand",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "When summoned, deal 3 damage to al enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "182",
+    "name": "i 0 | C)",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "Once per game, reduce an enemy card’s defense to 0. Flavor Text: The poison spreads, corrupting all it touches.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "183",
+    "name": "DISRUPTOR",
+    "cost": 1,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "All Doom and Death cards gain +1 attack and +1 defense.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "184",
+    "name": "KNIFE CATCHER",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Once per game, banish an enemy card from the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "185",
+    "name": "BOTTOM FEEDER",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "neutral",
+    "effectText": "Immune to all non-attack effects.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "186",
+    "name": "Do Nothing",
+    "cost": 6,
+    "attack": 8,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "When this card defends, gain 1 can.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "187",
+    "name": "Do Nothing (new variant)",
+    "cost": 4,
+    "attack": 5,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "When this card attacks, all Fly cards gain +1 attack for this turn. Flavor] Text: Lightning follows its wings as it tears through the heavens. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "188",
+    "name": "THE_HORROR",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "When summoned, force an enemy card to lose 2 attack this turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "189",
+    "name": "| BS’ li",
+    "cost": 7,
+    "attack": 9,
+    "defense": 6,
+    "cardType": "fly",
+    "effectText": "When this card enters the battlefield, heal your health by 3.",
+    "isFragment": false,
+    "effects": {
+      "onSummonHeal": 3
+    }
+  },
+  {
+    "id": "19",
+    "name": "Departed",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "EYE ie 8 bar lel 2) «fm d a] ry £5 | Se, =- fy i 1 5 iri! f HE HE Al fit] fot. Clg Hi BREST I JE | ur i fla fie ht IL Jak \\ 1: I ITER | summoned, all Fly cards lose all attack and defense point. Flavor Text: A world plunged intd darkness, where nothing can be trusted. ———",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "190",
+    "name": "TN",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "When summoned, deal 3 damage to an enemy card. Flavor Text: Its sharp eyes see every weakness.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "191",
+    "name": "EXPERTS",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "When this card is destroyed, deal 2 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "192",
+    "name": "Proof of War",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "When this card is destroyed, deal 2 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "193",
+    "name": "Afterburn #195/870",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Whenever a card is destroyed, this card gains +2 attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "194",
+    "name": "|",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When summoned, return a Death card from your graveyard to your hand.",
+    "isFragment": false,
+    "effects": {
+      "onReturnFromGraveToHand": {
+        "type": "death",
+        "count": 1
+      }
+    }
+  },
+  {
+    "id": "195",
+    "name": "- pe",
+    "cost": 3,
+    "attack": 4,
+    "defense": 2,
+    "cardType": "death",
+    "effectText": "If this card destroys an enemy, summon a 1/1 token.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 1,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "196",
+    "name": "Traitors",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "Cannot be targeted by effects.",
+    "isFragment": false,
+    "effects": {
+      "untargetable": true
+    }
+  },
+  {
+    "id": "197",
+    "name": "Saint_Less (Fire)",
+    "cost": 2,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When summoned, draw 1 card and -1 to life of opponents.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 1
+    }
+  },
+  {
+    "id": "198",
+    "name": "Saint_Less (Control)",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "When summoned, deal 3 damage to all cards on the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 3
+    }
+  },
+  {
+    "id": "199",
+    "name": "NGMI",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "When summoned, deal 3 damage to all cards on the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 3
+    }
+  },
+  {
+    "id": "2",
+    "name": "Vaping Won't Save You",
+    "cost": 4,
+    "attack": 5,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "When Vaping Won't Save You attacks an type Doom card, destroy it and returi 1 can of KING Cricket Soup to your stock. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "20",
+    "name": "Death Wannabe",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "death",
+    "effectText": "Once per game, you may return 2 Doom cards from your graveyard to your hand.",
+    "isFragment": false,
+    "effects": {
+      "onReturnFromGraveToHand": {
+        "type": "doom",
+        "count": 2
+      }
+    }
+  },
+  {
+    "id": "200",
+    "name": "BeastMode",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Reduces an enemy card's defense by 3 upon summoning.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDebuffTargetDef": 3
+    }
+  },
+  {
+    "id": "201",
+    "name": "The Death of Cash",
+    "cost": 9,
+    "attack": 11,
+    "defense": 8,
+    "cardType": "death",
+    "effectText": "When summoned, gain 2 cans..",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 2
+    }
+  },
+  {
+    "id": "202",
+    "name": "u jr Shey",
+    "cost": 10,
+    "attack": 12,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "Grants all allied cards +1 attack while on the battlefield.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "203",
+    "name": "DANKRUPT",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "When this card attacks, deal 2 damage to all enemy cards.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDmgAllEnemy": 2
+    }
+  },
+  {
+    "id": "204",
+    "name": "BANGERS AND CRASH",
+    "cost": 8,
+    "attack": 9,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Once per turn, make one enemy card lose all abilities",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "205",
+    "name": "PUMP KING",
+    "cost": 9,
+    "attack": 11,
+    "defense": 8,
+    "cardType": "death",
+    "effectText": "When summoned, return all Fly cards from your graveyard to your hand.",
+    "isFragment": false,
+    "effects": {
+      "onReturnFromGraveToHand": {
+        "type": "fly",
+        "count": 99
+      }
+    }
+  },
+  {
+    "id": "206",
+    "name": "& 75 ng Se TB,",
+    "cost": 9,
+    "attack": 11,
+    "defense": 8,
+    "cardType": "death",
+    "effectText": "When summoned, return all Fly cards from your graveyard to your hand.",
+    "isFragment": false,
+    "effects": {
+      "onReturnFromGraveToHand": {
+        "type": "fly",
+        "count": 99
+      }
+    }
+  },
+  {
+    "id": "207",
+    "name": "DECAY",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "When this card destroys an enemy, gain 1 can. Flavor Text: Its blade whispers promises of swift ends.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "208",
+    "name": "Grifter #000",
+    "cost": 10,
+    "attack": 12,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "Once per game, summon two 3/3 tokens.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 2,
+        "atk": 3,
+        "def": 3,
+        "type": "legendary"
+      }
+    }
+  },
+  {
+    "id": "209",
+    "name": "THE FUD",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Cannot be attacked by non-Fly cards.",
+    "isFragment": false,
+    "effects": {
+      "flyingStealth": true
+    }
+  },
+  {
+    "id": "21",
+    "name": "Cracked",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "When summoned, your opponent discards 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "210",
+    "name": "'SPECIAL OPERATION!",
+    "cost": 10,
+    "attack": 12,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "When summoned, destroy the strongest enemy card.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "211",
+    "name": "AFTERBURN",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "When summoned, heal your health by 4.",
+    "isFragment": false,
+    "effects": {
+      "onSummonHeal": 4
+    }
+  },
+  {
+    "id": "212",
+    "name": "REACHBACK",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "If summoned at night, gain +2 attack for this turn. Flavor Text: A celestial guardian tha shines brightest in the dark.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "213",
+    "name": "GUZZLER",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "When this card attacks, draw 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDraw": 1
+    }
+  },
+  {
+    "id": "214",
+    "name": "DAMAGER",
+    "cost": 6,
+    "attack": 7,
+    "defense": 7,
+    "cardType": "fly",
+    "effectText": "Gains +2 attack if your opponent has no Fly cards.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "215",
+    "name": "DAMAGER LUXE",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "When this card is destroyed, deal 3 damage to a random enemy.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgTarget": 3
+    }
+  },
+  {
+    "id": "216",
+    "name": "WASTER",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "Can attack twice per turn. Flavo Text: Swift as the wind, deadly as the storm.",
+    "isFragment": false,
+    "effects": {
+      "doubleAttack": true
+    }
+  },
+  {
+    "id": "217",
+    "name": "MAX PAIN #5966/7394",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "fly",
+    "effectText": "Destroy one enemy Fly card when this card is summoned.",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "fly"
+    }
+  },
+  {
+    "id": "218",
+    "name": "GOURMET SPICY",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "When this card is destroyed, summon a 3/3 Death token.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 3,
+        "def": 3,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "219",
+    "name": "Right Click Share #0",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "When summoned, reduce the attack of all enemy cards by 1. Flavol Text: Its scream chills the soul and saps the will. a",
+    "isFragment": false,
+    "effects": {
+      "onSummonDebuffAllEnemyAtk": 1
+    }
+  },
+  {
+    "id": "22",
+    "name": "F is for Fuckup",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Upon attack, remove 1 random card from your opponent's deck.",
+    "isFragment": false,
+    "effects": {
+      "onAttackMillOpponent": 1
+    }
+  },
+  {
+    "id": "220",
+    "name": "God is typing...",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Deals 2 damage to all cards when destroyed.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgAll": 2
+    }
+  },
+  {
+    "id": "221",
+    "name": "Decal by XCOPY",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "death",
+    "effectText": "Gain 2 cans when this card is destroyed.",
+    "isFragment": false,
+    "effects": {
+      "onDeathGainSoup": 2
+    }
+  },
+  {
+    "id": "222",
+    "name": "STEADY",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "Whenever a Death card is played, heal this card for 2.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "223",
+    "name": "EXIT STRATEGY",
+    "cost": 2,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "When summoned, deal 3 damage to an enemy card of your choice.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 3
+    }
+  },
+  {
+    "id": "224",
+    "name": "LA WHENEVER",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "doom",
+    "effectText": "When this card attacks, deal 1 damage to all enemy cards",
+    "isFragment": false,
+    "effects": {
+      "onAttackDmgAllEnemy": 1
+    }
+  },
+  {
+    "id": "225",
+    "name": "MESCO TETRO",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "Destroy an enemy card with 5 or less attack when this card is summoned.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "226",
+    "name": "AISLE 5 WORMHOLE",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "doom",
+    "effectText": "All cards take 1 damage at the end of each turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "227",
+    "name": "LUXURY MICROWAVE MASH",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "doom",
+    "effectText": "When this card attacks, summon a 3/3 Doom token. Flavol Text: Its army grows with each passing strike. a",
+    "isFragment": false,
+    "effects": {
+      "onAttackSummonToken": {
+        "count": 1,
+        "atk": 3,
+        "def": 3,
+        "type": "doom"
+      }
+    }
+  },
+  {
+    "id": "228",
+    "name": "CLUTCHES",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "When destroyed, shuffle this card back into your deck. Flavor Text: An immortal presence on the battlefield.",
+    "isFragment": false,
+    "effects": {
+      "onDeathRecycleToDeck": true
+    }
+  },
+  {
+    "id": "229",
+    "name": "R=MNANTS",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Once per game, change the effect of an enemy card to ‘none’.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "230",
+    "name": "ALGO BRO",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "When summoned, draw 2 cards.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 2
+    }
+  },
+  {
+    "id": "231",
+    "name": "OBLIVION",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "When this card attacks, deal 3 damage to the enemy player.",
+    "isFragment": false,
+    "effects": {
+      "onAttackDmgTarget": 3
+    }
+  },
+  {
+    "id": "232",
+    "name": "SIMULACRUM",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "Destroy all cards with 3 or less defense when this card is summoned.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "233",
+    "name": "PROTO-SHADY",
+    "cost": 12,
+    "attack": 40,
+    "defense": 30,
+    "cardType": "legendary",
+    "effectText": "Requires the sacrifice of 3 Doom cards to summon. Immune to effects from cards that cost 6 or fewer cans. Gains +5 attack each time it destroys an enemy card",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "234",
+    "name": "PROTO-WRETCH",
+    "cost": 12,
+    "attack": 35,
+    "defense": 40,
+    "cardType": "legendary",
+    "effectText": "Requires the sacrifice of 3 Death cards to summon. Reduces the attack of all enemy cards by 10 upon summoning. Heals your player for 3 health at the start of each turn. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonHeal": 3
+    }
+  },
+  {
+    "id": "235",
+    "name": "PROTO-GOUGE",
+    "cost": 12,
+    "attack": 37,
+    "defense": 37,
+    "cardType": "legendary",
+    "effectText": "Requires the sacrifice of 3 Fly cards to summon. Can attack all enemy cards in a single turn. Gains +2 defense each time it is attacked but survives.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "236",
+    "name": "BANG BANG",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Cannot be destroyed in combat. When combined with the other Fragments in your hand, you win the game. Flavor Text: The mind is the seed of creation. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "237",
+    "name": "SIDEWAYZ",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Cannot be destroyed in combat. When combined with the other Fragments in your hand, you win the game. Flavor Text: The heart fuels creation with boundless energy. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "238",
+    "name": "CHURN",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Cannot be destroyed in combat. When combined with the other Fragments in your hand, you win the game. Flavor Text: The body gives shape to creation. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "239",
+    "name": "CRAWLER",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Cannot be destroyed in combat. When combined with the other Fragments in your hand, you win the game. Flavor Text: The spirit breathes life into creatior. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "240",
+    "name": "XOMBO",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Cannot be destroyed in combat. When combined with the other Fragments in your hand, you win the game. Flavor Text: The soul binds all fragments into harmony. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "241",
+    "name": "SH_MASH_MA",
+    "cost": 3,
+    "attack": 50,
+    "defense": 50,
+    "cardType": "legendary",
+    "effectText": "When summoned, destroy all enemy cards and deal 10 damage to the enemy player.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 10
+    }
+  },
+  {
+    "id": "242",
+    "name": "BOT_ROT",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Search you deck for 3 Fragment of Creation and add it to your hand. Flavor Text: A sanctuary where legends awaken. LJ",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "243",
+    "name": "COPE SALADA #1",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Sacrifice one card to searc your deck for a card. Flavo Text: Call forth the ancient powers with a single offering.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "244",
+    "name": "REIGN",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Return up to 3 Fragments of Creation from your discard pile to your deck and gain 50 life.",
+    "isFragment": true,
+    "effects": {
+      "winCombo": true,
+      "cannotBeDestroyedInCombat": true
+    }
+  },
+  {
+    "id": "245",
+    "name": "HEAVY",
+    "cost": 6,
+    "attack": 5,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "If you control a legendary card, destroy all enemy cards with attack 5 or less and gain 50 life.",
+    "isFragment": false,
+    "effects": {
+      "onSummonHeal": 5
+    }
+  },
+  {
+    "id": "246",
+    "name": "Loading New Conflict... Redux 5",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Once per turn, destroy 1 opponent's Death card. Flavor Text: The ruler of the corrupted, infecting all that he touches. LJ",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "death"
+    }
+  },
+  {
+    "id": "247",
+    "name": "Loading New Conflict... Redux 2",
+    "cost": 8,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "after summoning, discard your opponent's entire hand then your opponent's draw 5 cards from the deck.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 5
+    }
+  },
+  {
+    "id": "248",
+    "name": "Loading New Conflict... Redux 6",
+    "cost": 10,
+    "attack": 12,
+    "defense": 10,
+    "cardType": "neutral",
+    "effectText": "Upo summon, look on your deck and gain 5 cans of KING Cricket Soup.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 5
+    }
+  },
+  {
+    "id": "249",
+    "name": "Loading New Conflict... Redux 3",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "legendary",
+    "effectText": "Once per turn, discard 1 card in your opponent's hand then you draw a card. a",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 1,
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "250",
+    "name": "Loading New Conflict... Redux",
+    "cost": 3,
+    "attack": 4,
+    "defense": 3,
+    "cardType": "legendary",
+    "effectText": "When summoned, look on your deck and gain 1 can of KING Cricket Soup. Flavor Text:With the wisdom of th ancient skies, it watches over all.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "251",
+    "name": "Loading New Conflict... Redux 4",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "On attack, this card gains +1 attack for each Fly card in your graveyard.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "252",
+    "name": "New Teeth 2033",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "after summoning, deal 4 damage to a opponent's card. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 4
+    }
+  },
+  {
+    "id": "253",
+    "name": "Tap your card when you're ready sir",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Counter 2 type Fly or Legendary. Flavor Text: The last war, where thers were no winners, only survivors. a",
+    "isFragment": false,
+    "effects": {
+      "isCounter": true,
+      "counterTarget": "fly"
+    }
+  },
+  {
+    "id": "254",
+    "name": "Bitcoin Protestors",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Freeze (can't attack or defend) one enemy card when this card attacks.",
+    "isFragment": false,
+    "effects": {
+      "freezeTarget": true
+    }
+  },
+  {
+    "id": "255",
+    "name": "Loading New Conflict... Redux 1",
+    "cost": 8,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "after summoning, destroy 2 cards or your opponent's the type Fly or Death or Doom.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "256",
+    "name": "EMPIRE THINGS",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "neutral",
+    "effectText": "If EMPIRE THINGS is on the game, you can lose the game LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "3",
+    "name": "Feeding",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "doom",
+    "effectText": "Pay 2 Energy and all players must discard 2 cards from their hand. Then, each player draws 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 2
+    }
+  },
+  {
+    "id": "30",
+    "name": "Dirtbag",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "after summoning , all your type fly gain +2 attack",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "31",
+    "name": "Disaster Suit",
+    "cost": 5,
+    "attack": 6,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "When destroyed, return this card to the bottom of your deck.",
+    "isFragment": false,
+    "effects": {
+      "onDeathRecycleToDeck": true
+    }
+  },
+  {
+    "id": "32",
+    "name": "Don't Scroll",
+    "cost": 3,
+    "attack": 4,
+    "defense": 2,
+    "cardType": "neutral",
+    "effectText": "Once per game, prevent all damage targeting this card.Flavor Text: Corroded and forgotten but still a deadly force. LJ",
+    "isFragment": false,
+    "effects": {
+      "shieldOnce": true
+    }
+  },
+  {
+    "id": "33",
+    "name": "One squeeze is enough for a sink full of dishes",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When this card is summoned, discard 1 card from your opponent's hand.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "34",
+    "name": "Hackproof 2049",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "death",
+    "effectText": "Once per turn, return 1 card from your graveyards pile to your hand",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "35",
+    "name": "New Teeth 2033",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "after summoning , deal 4 damage to a random opponent’s card a",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 4
+    }
+  },
+  {
+    "id": "36",
+    "name": "WANT_3",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Pay 1 energy and return 1 card from your graveyard to the field",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "37",
+    "name": "WANT _1",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "Pay 2 energy and deal 2 damage to all cards on the field, including your own. Flavor Text: A pulse of doom, bringing destruction to all i its wake.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 2
+    }
+  },
+  {
+    "id": "38",
+    "name": "WANT_2",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "After summoning , prevent your opponent from summoning cards for 1 turn.",
+    "isFragment": false,
+    "effects": {
+      "lockSummonsOneTurn": true
+    }
+  },
+  {
+    "id": "39",
+    "name": "The Doomed",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "All players get 3 damage on the end on the turn. Flavor Text: The world is frozen in time, and no one can act.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "4",
+    "name": "Anxiety",
+    "cost": 2,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "SE A Olt NP GTP CBE PO ER RE pe Gorman Be EE at fesse ie eal hl Prine ten EE i ee He RS ee Py SEERA ee nasa , h opponent's card , discard 1 card fro their hand. Flavor Text: Data turns to decay. The digital infection spreads. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "40",
+    "name": "Jobsworth 2029",
+    "cost": 6,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "After summoning lose your draw phase next turn and make 4 damage to opponents life.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgPlayer": 4
+    }
+  },
+  {
+    "id": "41",
+    "name": "Alight here for Dystopia",
+    "cost": 4,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Counter a type Doom or Death.",
+    "isFragment": false,
+    "effects": {
+      "isCounter": true,
+      "counterTarget": "death"
+    }
+  },
+  {
+    "id": "42",
+    "name": "ap your card when you're ready si",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Counter a type Fly or Legendary.",
+    "isFragment": false,
+    "effects": {
+      "isCounter": true,
+      "counterTarget": "fly"
+    }
+  },
+  {
+    "id": "43",
+    "name": "Distortion Therapy",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Counter any type of card and discard a card randomly from you hand.",
+    "isFragment": false,
+    "effects": {
+      "isCounter": true,
+      "counterTarget": "any"
+    }
+  },
+  {
+    "id": "44",
+    "name": "And how does that make you feel",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "legendary",
+    "effectText": "Once per game, gain 2 cans of KING Cricket Soup.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 2
+    }
+  },
+  {
+    "id": "45",
+    "name": "Generation Null",
+    "cost": 9,
+    "attack": 10,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Whenever a Fly card attacks, reduce its attack by 1 for that turn.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "46",
+    "name": "REKT Guts",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "When summoned, destroy 1 Death card in your opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "death"
+    }
+  },
+  {
+    "id": "47",
+    "name": "Lockup",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "All Doom cards on the field gain +1 attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "48",
+    "name": "Dead Cat Bounce",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "Once per game, force both players to discard 1 card and draw 2 cards from the deck.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 2,
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "49",
+    "name": "Disintegration",
+    "cost": 10,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "ones per game shuffle your graveyard in to your deck, your opponent’s discard 2 cards from their hand.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 2
+    }
+  },
+  {
+    "id": "5",
+    "name": "Reflection",
+    "cost": 2,
+    "attack": 3,
+    "defense": 2,
+    "cardType": "fly",
+    "effectText": "Cannot be blocked by Death cards.",
+    "isFragment": false,
+    "effects": {
+      "unblockableByDeath": true
+    }
+  },
+  {
+    "id": "50",
+    "name": "LIES",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "Eas La Bolen & DNR MSL Pr p Mo le TE Once per game, negate all effects from a Doom card. Flavor Text: Riding beyond the horizon, where no light can ever reach. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "51",
+    "name": "Sa",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "Once per game, destroy 1 Doom card from| the opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onDestroySingleType": "doom"
+    }
+  },
+  {
+    "id": "52",
+    "name": "he Good Men Who Do Nothing",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "Whenever you summon a Fly card, gain 1 extra can.",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 1
+    }
+  },
+  {
+    "id": "53",
+    "name": "Right-click and Save As guy",
+    "cost": 3,
+    "attack": 4,
+    "defense": 2,
+    "cardType": "fly",
+    "effectText": "Once per game, take a card from the opponent’s graveyard pile and add it to your hand.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "54",
+    "name": "&",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "neutral",
+    "effectText": "This card gains +1 attack for every card in your hand.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "55",
+    "name": "Remnant",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "When summoned, your opponent must discard 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "56",
+    "name": "Chatbot and Chill?",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "At the end of each turn, if this card has attacked, heal 1 damage to any card on the field.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "57",
+    "name": "Last Human Police 2039",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "death",
+    "effectText": "Whenever this card is destroyed, deal 3 damage to a random enemy card.",
+    "isFragment": false,
+    "effects": {
+      "onDeathDmgTarget": 3,
+      "onDestroyRandomEnemy": true
+    }
+  },
+  {
+    "id": "58",
+    "name": "The Jungle",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "Summon 4 1/1 Death Tokens.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 4,
+        "atk": 1,
+        "def": 1,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "59",
+    "name": "Lurk",
+    "cost": 5,
+    "attack": 6,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "When summoned, force your opponent to discard 1 random card from their hand.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "6",
+    "name": "All Time High in the City",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "When summoned, gain 2 cans of KING Cricket Soup. Flavor Text: Wings that pierce the s! leaving a trail of broken buildings. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonGainSoup": 2
+    }
+  },
+  {
+    "id": "60",
+    "name": "Null Liked Your Post",
+    "cost": 3,
+    "attack": 4,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "Once per game, inflict 2 damage to a random enemy card. Flavor Text: What was once a toy is now an instrument of vengeance. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 2,
+      "onDestroyRandomEnemy": true
+    }
+  },
+  {
+    "id": "61",
+    "name": "Born to Buy",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "death",
+    "effectText": "When summoned, steal the attack and defense of opponents type death card.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "62",
+    "name": "Last Selfie",
+    "cost": 4,
+    "attack": 3,
+    "defense": 2,
+    "cardType": "doom",
+    "effectText": "Once per game, sacrifice one of your cards to summon a 10/5 Doom card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 1,
+        "atk": 10,
+        "def": 5,
+        "type": "doom"
+      }
+    }
+  },
+  {
+    "id": "63",
+    "name": "Fe RL He",
+    "cost": 5,
+    "attack": 6,
+    "defense": 3,
+    "cardType": "doom",
+    "effectText": "At the end of your turn, deal 2 damage to all cards on the field.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAll": 2
+    }
+  },
+  {
+    "id": "64",
+    "name": "Hatehole",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "Once per turn, deal 1 damage to each opponent’s card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 1
+    }
+  },
+  {
+    "id": "65",
+    "name": "hello admin pm me",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "After summoning at the end of your turn sacrifice a card on your field to make -1 attack on all opponent’s cards on the field.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDebuffAllEnemyAtk": 1
+    }
+  },
+  {
+    "id": "66",
+    "name": "Null started following you",
+    "cost": 5,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Once per turn, return 3 type Fly cards from your graveyard to your hand LJ",
+    "isFragment": false,
+    "effects": {
+      "onReturnFromGraveToHand": {
+        "type": "fly",
+        "count": 3
+      }
+    }
+  },
+  {
+    "id": "67",
+    "name": "=),",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "doom",
+    "effectText": "Once per game, all Doom cards on the field gain +2 attack. Flavor Text: A rider from the depths of despair, bringing chaos in his wake. LJ",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "68",
+    "name": "Nullwave",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "legendary",
+    "effectText": "Whenever a Doom card is played, gain 1 can of KING Cricket Soup from outside the game.",
+    "isFragment": false,
+    "effects": {
+      "onPlayTypeGainSoup": {
+        "type": "doom",
+        "amount": 1
+      }
+    }
+  },
+  {
+    "id": "69",
+    "name": "wd JE",
+    "cost": 10,
+    "attack": 11,
+    "defense": 9,
+    "cardType": "death",
+    "effectText": "When summoned, destroy all Death cards on the field.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyAllType": "death"
+    }
+  },
+  {
+    "id": "7",
+    "name": "Some Asshole",
+    "cost": 1,
+    "attack": 1,
+    "defense": 2,
+    "cardType": "fly",
+    "effectText": "When summoned, reveal the top card from your opponent's deck and destroy that card",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "71",
+    "name": "Space Junkie",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "Once per game, double the attack of all Doom cards for 1 turn. Flavor Text: A relentless chaser, armored and prepared for the end of days. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDoubleAtkType": "doom"
+    }
+  },
+  {
+    "id": "72",
+    "name": "Crunch",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "This card gains +1 attack for every card in your hand.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "73",
+    "name": "= =<",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "neutral",
+    "effectText": "Whenever this card is destroyed, summo 1 Legendary card from your deck.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "74",
+    "name": "House of FOMO",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "Once per game, choose 1 Doom card and destroy all cards with the same type in play.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "75",
+    "name": "When Airdrop?",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "fly",
+    "effectText": "Whenever a Fly card is destroyed, gain 2 cans.",
+    "isFragment": false,
+    "effects": {
+      "onDeathGainSoup": 2
+    }
+  },
+  {
+    "id": "76",
+    "name": "Afterglow",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "Once per game, deal 3 damage to all cards on the opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 3
+    }
+  },
+  {
+    "id": "77",
+    "name": "You could seriously be a model",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "Once per game, move 1 card from your hand to the battlefield for free.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "78",
+    "name": "Deathwave",
+    "cost": 6,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "fly",
+    "effectText": "Once per game, deal 4 damage to one enemy card. LJ",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 4
+    }
+  },
+  {
+    "id": "79",
+    "name": "er",
+    "cost": 3,
+    "attack": 4,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "Whenever an opponent plays a card, deal 1 damage to a random enemy.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgTarget": 1
+    }
+  },
+  {
+    "id": "8",
+    "name": "Greedy Guts",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "Deal 2 damage to opponent’s Life Points when summoned.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgPlayer": 2
+    }
+  },
+  {
+    "id": "80",
+    "name": "Happy Consume",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "neutral",
+    "effectText": "Gain 5 extra life every time this card is summoned. Flavor Text: A divine creature, watching over the chaos below.",
+    "isFragment": false,
+    "effects": {
+      "onSummonHeal": 5
+    }
+  },
+  {
+    "id": "81",
+    "name": "Some Other Asshole",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "fly",
+    "effectText": "Once per game, prevent all damage dealt by Doom cards for 1 turn.",
+    "isFragment": false,
+    "effects": {
+      "shieldOnce": true
+    }
+  },
+  {
+    "id": "82",
+    "name": "Death by Algorithm",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "fly",
+    "effectText": "Whenever this card is destroyed, summon a 3/3 Death token.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 3,
+        "def": 3,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "83",
+    "name": "Fleshtrap",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "fly",
+    "effectText": "Once per game, make all cards on the opponent's field lose 2 defense.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDebuffAllEnemyDef": 2
+    }
+  },
+  {
+    "id": "84",
+    "name": "A",
+    "cost": 7,
+    "attack": 8,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "Whenever a Death card is destroyed, summon a 4/4 Death token.",
+    "isFragment": false,
+    "effects": {
+      "onDeathSummonToken": {
+        "count": 1,
+        "atk": 4,
+        "def": 4,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "85",
+    "name": "The State of Us",
+    "cost": 5,
+    "attack": 6,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Whenever an enemy card is destroyed, gain 1 life.",
+    "isFragment": false,
+    "effects": {
+      "onDeathHeal": 1
+    }
+  },
+  {
+    "id": "86",
+    "name": "Card 86",
+    "cost": 6,
+    "attack": 7,
+    "defense": 5,
+    "cardType": "death",
+    "effectText": "Once per game, sacrifice 1 card to summon a 6/6 Death card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonToken": {
+        "count": 1,
+        "atk": 6,
+        "def": 6,
+        "type": "death"
+      }
+    }
+  },
+  {
+    "id": "87",
+    "name": "Gobshite",
+    "cost": 6,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "All cards on the opponent's field lose 1 attack and 1 defense for every card on opponent's hand. Flavor Text: A plague that spreads, decimating all in its wake.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "88",
+    "name": "The Useless",
+    "cost": 5,
+    "attack": 6,
+    "defense": 4,
+    "cardType": "doom",
+    "effectText": "Once per game, no cards can be} summoned for 1 turn.",
+    "isFragment": false,
+    "effects": {
+      "lockSummonsOneTurn": true
+    }
+  },
+  {
+    "id": "89",
+    "name": "©",
+    "cost": 7,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "Once per game, deal 5 damage to all cards on the opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDmgAllEnemy": 5
+    }
+  },
+  {
+    "id": "9",
+    "name": "Post Debt",
+    "cost": 2,
+    "attack": 3,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "If this card is destroyed, return it to the top of your deck instead.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "90",
+    "name": "bo",
+    "cost": 4,
+    "attack": 6,
+    "defense": 2,
+    "cardType": "doom",
+    "effectText": "Once per game, destroy one of your opponent's cards at random.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyRandomEnemy": true
+    }
+  },
+  {
+    "id": "91",
+    "name": "The Doomed (Mono)",
+    "cost": 6,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "doom",
+    "effectText": "For every Doom card on your side, all your cards gain +1 attack and defense.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "92",
+    "name": "DISCONNECT",
+    "cost": 9,
+    "attack": 10,
+    "defense": 8,
+    "cardType": "neutral",
+    "effectText": "Once per game, destroy all cards with less than 3 attack.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyByStat": 3
+    }
+  },
+  {
+    "id": "93",
+    "name": "Us and Them",
+    "cost": 10,
+    "attack": 12,
+    "defense": 10,
+    "cardType": "fly",
+    "effectText": "When summoned, destroy all card with the Fly type on the opponent's field.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyAllType": "fly"
+    }
+  },
+  {
+    "id": "94",
+    "name": "Card 94",
+    "cost": 8,
+    "attack": 9,
+    "defense": 7,
+    "cardType": "neutral",
+    "effectText": "Once per turn, force your opponent to discard 1 card.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDiscardOpp": 1
+    }
+  },
+  {
+    "id": "95",
+    "name": "Feels off-brand",
+    "cost": 8,
+    "attack": 9,
+    "defense": 6,
+    "cardType": "doom",
+    "effectText": "All Doom cards on the battlefield gain +1 attack.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "96",
+    "name": "Echoes of a Dead Earth (blue)",
+    "cost": 10,
+    "attack": 11,
+    "defense": 8,
+    "cardType": "legendary",
+    "effectText": "All Doom cards on the battlefield deal 2 additional damage.",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "97",
+    "name": "You're wasting your life. Literally.",
+    "cost": 9,
+    "attack": 10,
+    "defense": 7,
+    "cardType": "death",
+    "effectText": "Once per game, choose one of your opponent's cards to destroy.",
+    "isFragment": false,
+    "effects": {
+      "onDestroyChoiceEnemy": true
+    }
+  },
+  {
+    "id": "98",
+    "name": "Bad Flavour",
+    "cost": 8,
+    "attack": 9,
+    "defense": 6,
+    "cardType": "legendary",
+    "effectText": "Whenever a Doom card is played, increase all cards’ attack by 1 for 1 turn,",
+    "isFragment": false,
+    "effects": {}
+  },
+  {
+    "id": "99",
+    "name": "OVERWHELM",
+    "cost": 4,
+    "attack": 5,
+    "defense": 3,
+    "cardType": "neutral",
+    "effectText": "Draw 1 card every time this card is summoned.",
+    "isFragment": false,
+    "effects": {
+      "onSummonDraw": 1
+    }
+  },
+  {
+    "id": "card_back (9)",
+    "name": "11",
+    "cost": 3,
+    "attack": 0,
+    "defense": 0,
+    "cardType": "neutral",
+    "effectText": "REUBIES",
+    "isFragment": false,
+    "effects": {}
+  }
+]
